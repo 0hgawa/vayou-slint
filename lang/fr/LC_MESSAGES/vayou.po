@@ -1,0 +1,445 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fr\n"
+
+msgid "Open File"
+msgstr "Ouvrir un Fichier"
+
+msgid "Open URL"
+msgstr "Ouvrir URL"
+
+msgid "Pause"
+msgstr "Pause"
+
+msgid "Play"
+msgstr "Lecture"
+
+msgid "Stop"
+msgstr "Arrêter"
+
+msgid "Subtitles"
+msgstr "Sous-titres"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Speed"
+msgstr "Vitesse"
+
+msgid "Chapters"
+msgstr "Chapitres"
+
+msgid "Aspect Ratio"
+msgstr "Rapport d'Aspect"
+
+msgid "A-B Loop"
+msgstr "Boucle A-B"
+
+msgid "Set A"
+msgstr "Définir A"
+
+msgid "Set B"
+msgstr "Définir B"
+
+msgid "Screenshot"
+msgstr "Capture d'Écran"
+
+msgid "Screenshot saved"
+msgstr "Capture enregistrée"
+
+msgid "Media Info"
+msgstr "Info du Média"
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Always on Top"
+msgstr "Toujours au Premier Plan"
+
+msgid "Sleep Timer"
+msgstr "Minuteur de Veille"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Off"
+msgstr "Désactivé"
+
+msgid "Auto"
+msgstr "Auto"
+
+msgid "No subtitle tracks"
+msgstr "Aucune piste de sous-titres"
+
+msgid "No audio tracks"
+msgstr "Aucune piste audio"
+
+msgid "Disable"
+msgstr "Désactiver"
+
+msgid "Open local subtitle"
+msgstr "Ouvrir un sous-titre local"
+
+msgid "ON"
+msgstr "ACTIVÉ"
+
+msgid "Delay"
+msgstr "Délai"
+
+msgid "Translate"
+msgstr "Traduire"
+
+msgid "Style"
+msgstr "Style"
+
+msgid "Reset"
+msgstr "Réinitialiser"
+
+msgid "Font"
+msgstr "Police"
+
+msgid "Size"
+msgstr "Taille"
+
+msgid "Text Color"
+msgstr "Couleur du Texte"
+
+msgid "Border Color"
+msgstr "Couleur de la Bordure"
+
+msgid "Border Size"
+msgstr "Taille de la Bordure"
+
+msgid "Position"
+msgstr "Position"
+
+msgid "Text"
+msgstr "Texte"
+
+msgid "Bold"
+msgstr "Gras"
+
+msgid "Border"
+msgstr "Bordure"
+
+msgid "Playlist"
+msgstr "Liste de Lecture"
+
+msgid "Empty playlist"
+msgstr "Liste de lecture vide"
+
+msgid "+ Files"
+msgstr "+ Fichiers"
+
+msgid "+ Folder"
+msgstr "+ Dossier"
+
+msgid "Clear"
+msgstr "Vider"
+
+msgid "Remove"
+msgstr "Supprimer"
+
+msgid "Shuffle"
+msgstr "Aléatoire"
+
+msgid "Repeat"
+msgstr "Répéter"
+
+msgid "items"
+msgstr "éléments"
+
+msgid "Search online..."
+msgstr "Rechercher en ligne..."
+
+msgid "Search Online"
+msgstr "Rechercher en Ligne"
+
+msgid "Search subtitle"
+msgstr "Rechercher un sous-titre"
+
+msgid "Searching..."
+msgstr "Recherche en cours..."
+
+msgid "No results"
+msgstr "Aucun résultat"
+
+msgid "Download failed"
+msgstr "Échec du téléchargement"
+
+msgid "File"
+msgstr "Fichier"
+
+msgid "Resolution"
+msgstr "Résolution"
+
+msgid "Video Codec"
+msgstr "Codec Vidéo"
+
+msgid "Audio Codec"
+msgstr "Codec Audio"
+
+msgid "FPS"
+msgstr "FPS"
+
+msgid "Video Bitrate"
+msgstr "Débit Vidéo"
+
+msgid "Audio Bitrate"
+msgstr "Débit Audio"
+
+msgid "Duration"
+msgstr "Durée"
+
+msgid "File Size"
+msgstr "Taille du Fichier"
+
+msgid "General"
+msgstr "Général"
+
+msgid "Video"
+msgstr "Vidéo"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Preferred Audio Language"
+msgstr "Audio Préféré"
+
+msgid "Preferred Subtitle Language"
+msgstr "Sous-titre Préféré"
+
+msgid "Deinterlace"
+msgstr "Désentrelacer"
+
+msgid "Default Volume"
+msgstr "Volume par Défaut"
+
+msgid "Default Speed"
+msgstr "Vitesse par Défaut"
+
+msgid "Remember Position"
+msgstr "Mémoriser la Position"
+
+msgid "Auto Play"
+msgstr "Lecture Automatique"
+
+msgid "Remember Audio/Subtitle"
+msgstr "Mémoriser Audio/Sous-titre"
+
+msgid "Subtitle Encoding"
+msgstr "Codage du Sous-titre"
+
+msgid "Color"
+msgstr "Couleur"
+
+msgid "Brightness"
+msgstr "Luminosité"
+
+msgid "Contrast"
+msgstr "Contraste"
+
+msgid "Saturation"
+msgstr "Saturation"
+
+msgid "Zoom"
+msgstr "Zoom"
+
+msgid "Normalization"
+msgstr "Normalisation"
+
+msgid "Volume Boost"
+msgstr "Amplification du Volume"
+
+msgid "Equalizer"
+msgstr "Égaliseur"
+
+msgid "Apply Embedded Styles"
+msgstr "Appliquer les Styles Intégrés"
+
+msgid "Restore Defaults"
+msgstr "Restaurer les Valeurs par Défaut"
+
+msgid "Previous"
+msgstr "Précédent"
+
+msgid "Next"
+msgstr "Suivant"
+
+msgid "Fullscreen"
+msgstr "Plein Écran"
+
+msgid "Playback speed"
+msgstr "Vitesse de lecture"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Minimize"
+msgstr "Réduire"
+
+msgid "Maximize"
+msgstr "Agrandir"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Play / Pause"
+msgstr "Lecture / Pause"
+
+msgid "Seek Forward (5s)"
+msgstr "Avancer (5s)"
+
+msgid "Seek Forward (30s)"
+msgstr "Avancer (30s)"
+
+msgid "Seek Back (5s)"
+msgstr "Reculer (5s)"
+
+msgid "Seek Back (30s)"
+msgstr "Reculer (30s)"
+
+msgid "Frame Step"
+msgstr "Image Suivante"
+
+msgid "Frame Back"
+msgstr "Image Précédente"
+
+msgid "Speed Up"
+msgstr "Accélérer"
+
+msgid "Speed Down"
+msgstr "Ralentir"
+
+msgid "Volume Up"
+msgstr "Augmenter le Volume"
+
+msgid "Volume Down"
+msgstr "Baisser le Volume"
+
+msgid "Mute"
+msgstr "Muet"
+
+msgid "Cycle Subtitles"
+msgstr "Changer les Sous-titres"
+
+msgid "Cycle Audio"
+msgstr "Changer la Piste Audio"
+
+msgid "Shortcuts"
+msgstr "Raccourcis"
+
+msgid "Playback"
+msgstr "Lecture"
+
+msgid "Volume"
+msgstr "Volume"
+
+msgid "Tracks"
+msgstr "Pistes"
+
+msgid "Navigation"
+msgstr "Navigation"
+
+msgid "Reset All Shortcuts"
+msgstr "Réinitialiser Tous les Raccourcis"
+
+msgid "Press a key..."
+msgstr "Appuyez sur une touche..."
+
+msgid "Drop file to play"
+msgstr "Déposez le fichier pour le lire"
+
+msgid "Vayou"
+msgstr "Vayou"
+
+msgid "Drop a file here or press"
+msgstr "Déposez un fichier ici ou appuyez sur"
+
+msgid "to open"
+msgstr "pour ouvrir"
+
+msgid "OK"
+msgstr "D'ACCORD"
+
+msgid "About"
+msgstr "À propos"
+
+msgid "Interface"
+msgstr "Interface"
+
+msgid "Output"
+msgstr "Sortie"
+
+msgid "Flat"
+msgstr "Plat"
+
+msgid "Bass"
+msgstr "Basse"
+
+msgid "Treble"
+msgstr "Tripler"
+
+msgid "Vocal"
+msgstr "Vocal"
+
+msgid "Rock"
+msgstr "Rocher"
+
+msgid "Native video player"
+msgstr "Lecteur vidéo natif"
+
+msgid "Updates"
+msgstr "Mises à jour"
+
+msgid "Application updates"
+msgstr "Mises à jour des applications"
+
+msgid "Checking…"
+msgstr "Vérification…"
+
+msgid "You're on the latest version."
+msgstr "Vous êtes sur la dernière version."
+
+msgid "Downloading and verifying…"
+msgstr "Téléchargement et vérification…"
+
+msgid "Update installed — restart to apply."
+msgstr "Mise à jour installée : redémarrez pour appliquer."
+
+msgid "Check whether a newer version is available."
+msgstr "Vérifiez si une version plus récente est disponible."
+
+msgid "Open releases page"
+msgstr "Page des versions ouvertes"
+
+msgid "Restart now"
+msgstr "Redémarrer maintenant"
+
+msgid "Install"
+msgstr "Installer"
+
+msgid "Installing…"
+msgstr "Installation…"
+
+msgid "Check for updates"
+msgstr "Vérifier les mises à jour"
+
+msgid "Restore defaults"
+msgstr "Restaurer les valeurs par défaut"
+
+msgid "Reset every setting to its default value."
+msgstr "Réinitialisez chaque paramètre à sa valeur par défaut."
+
+msgid "Done"
+msgstr "Fait"
+
+msgid "{} min"
+msgstr "{} minutes"
+
+msgid "Version {} is available."
+msgstr "La version {} est disponible."
+
+msgid "Couldn't update: {}"
+msgstr "Impossible de mettre à jour : {}"

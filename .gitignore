@@ -1,0 +1,11 @@
+/target
+# Bundled native deps are large (~220 MB) and exceed GitHub limits — fetch per
+# README, like the Tauri build did.
+/binaries/libmpv-2.dll
+/binaries/ffmpeg.exe
+
+# Installer build output (produced by installer/build.ps1) — the .nsi and
+# build.ps1 are tracked; the signed artefacts and feed are not.
+/installer/Vayou-Setup.exe
+/installer/latest.json
+*.minisig

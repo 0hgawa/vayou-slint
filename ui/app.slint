@@ -1,0 +1,808 @@
+import { ScrollView } from "std-widgets.slint";
+import { Theme } from "theme.slint";
+import { Ic, AppIcon } from "icons.slint";
+import { CtrlButton, MenuItem, MenuSep, MenuSurface, SidePanel, Stepper, VolumeControl, ColorPicker } from "widgets.slint";
+import { ChapterRow, TrackRow, PlaylistRow, SubSearchRow, InfoRow, ShortcutRow, PlayerState, Catalog } from "state.slint";
+import { ContextMenu } from "context-menu.slint";
+import { SubtitlePanel } from "subtitle-panel.slint";
+import { SettingsPanel } from "settings-panel.slint";
+
+// Re-export the data structs the native (Rust) bridge builds, so the generated
+// module keeps exposing them under the same names. (RatioRow/NamedLang are used
+// only inside the extracted panels, which import them from state.slint directly.)
+export { ChapterRow, TrackRow, PlaylistRow, SubSearchRow, InfoRow, ShortcutRow }
+
+export component MainWindow inherits Window {
+    title: "Vayou";
+    no-frame: true;
+    background: transparent;
+    default-font-family: Theme.font;
+    preferred-width: 854px;
+    preferred-height: 480px;
+    min-width: 640px;
+    min-height: 360px;
+
+    // --- Aliases to the shared PlayerState global. The native (Rust) bridge keeps
+    // its existing ui.set_*/get_* API via these aliases, while every Slint
+    // component (incl. the extracted panels) reads/writes PlayerState directly. ---
+    in-out property <bool> playing <=> PlayerState.playing;
+    in-out property <float> current-time <=> PlayerState.current-time;
+    in-out property <float> duration <=> PlayerState.duration;
+    in-out property <float> volume <=> PlayerState.volume;
+    in-out property <bool> muted <=> PlayerState.muted;
+    in-out property <float> speed <=> PlayerState.speed;
+    in-out property <bool> fullscreen <=> PlayerState.fullscreen;
+    in-out property <bool> has-file <=> PlayerState.has-file;
+    in-out property <string> media-title <=> PlayerState.media-title;
+    in-out property <float> max-volume <=> PlayerState.max-volume;
+    in-out property <float> ab-a <=> PlayerState.ab-a;
+    in-out property <float> ab-b <=> PlayerState.ab-b;
+    in-out property <bool> ab-enabled <=> PlayerState.ab-enabled;
+    in-out property <[ChapterRow]> chapters <=> PlayerState.chapters;
+
+    // --- UI state ---
+    in-out property <bool> controls-visible <=> PlayerState.controls-visible;
+    in-out property <string> active-panel <=> PlayerState.active-panel;
+    in-out property <bool> url-show <=> PlayerState.url-show;
+    in-out property <string> url-text <=> PlayerState.url-text;
+    in-out property <string> toast <=> PlayerState.toast;
+    property <bool> show-remaining: false;
+    property <bool> cursor-hidden;
+    property <int> idle-ticks;
+
+    // --- Context menu ---
+    in-out property <bool> ctx-show <=> PlayerState.ctx-show;
+    in-out property <length> ctx-x <=> PlayerState.ctx-x;
+    in-out property <length> ctx-y <=> PlayerState.ctx-y;
+    in-out property <string> ctx-page <=> PlayerState.ctx-page;
+    in-out property <[TrackRow]> ctx-sub-tracks <=> PlayerState.ctx-sub-tracks;
+    in-out property <[TrackRow]> ctx-audio-tracks <=> PlayerState.ctx-audio-tracks;
+    in-out property <string> current-aspect <=> PlayerState.current-aspect;
+    in-out property <bool> pinned <=> PlayerState.pinned;
+    in-out property <int> sleep-min <=> PlayerState.sleep-min;
+    in-out property <string> sleep-remaining <=> PlayerState.sleep-remaining;
+
+    // --- Panels ---
+    in-out property <[TrackRow]> panel-sub-tracks <=> PlayerState.panel-sub-tracks;
+    in-out property <[TrackRow]> panel-audio-tracks <=> PlayerState.panel-audio-tracks;
+    in-out property <bool> sub-active <=> PlayerState.sub-active;
+    in-out property <float> sub-delay <=> PlayerState.sub-delay;
+    in-out property <float> audio-delay <=> PlayerState.audio-delay;
+    in-out property <[PlaylistRow]> playlist-items <=> PlayerState.playlist-items;
+    in-out property <string> repeat-mode <=> PlayerState.repeat-mode;
+    in-out property <bool> shuffle <=> PlayerState.shuffle;
+    in-out property <[InfoRow]> info-rows <=> PlayerState.info-rows;
+    in-out property <string> sub-page <=> PlayerState.sub-page;
+
+    // Subtitle style
+    in-out property <string> sub-font <=> PlayerState.sub-font;
+    in-out property <int> sub-size <=> PlayerState.sub-size;
+    in-out property <bool> sub-bold <=> PlayerState.sub-bold;
+    in-out property <color> sub-color <=> PlayerState.sub-color;
+    in-out property <color> sub-border-color <=> PlayerState.sub-border-color;
+    in-out property <string> sub-color-hex <=> PlayerState.sub-color-hex;
+    in-out property <string> sub-border-color-hex <=> PlayerState.sub-border-color-hex;
+    in-out property <bool> cp-show <=> PlayerState.cp-show;
+    in-out property <string> cp-target <=> PlayerState.cp-target;
+    in-out property <float> cp-hue <=> PlayerState.cp-hue;
+    in-out property <float> cp-sat <=> PlayerState.cp-sat;
+    in-out property <float> cp-val <=> PlayerState.cp-val;
+    in-out property <int> sub-border-size <=> PlayerState.sub-border-size;
+    in-out property <int> sub-position <=> PlayerState.sub-position;
+
+    // Translation
+    in-out property <string> translate-lang <=> PlayerState.translate-lang;
+    in-out property <string> translate-lang-name <=> PlayerState.translate-lang-name;
+    in-out property <bool> translating <=> PlayerState.translating;
+    in-out property <int> tr-progress <=> PlayerState.tr-progress;
+    in-out property <int> tr-total <=> PlayerState.tr-total;
+    in-out property <string> tr-error <=> PlayerState.tr-error;
+    in-out property <bool> tr-active <=> PlayerState.tr-active;
+
+    // OpenSubtitles search
+    in-out property <string> search-query <=> PlayerState.search-query;
+    in-out property <string> search-lang <=> PlayerState.search-lang;
+    in-out property <string> search-lang-name <=> PlayerState.search-lang-name;
+    in-out property <[SubSearchRow]> search-results <=> PlayerState.search-results;
+    in-out property <bool> searching <=> PlayerState.searching;
+    in-out property <int> downloading-index <=> PlayerState.downloading-index;
+    in-out property <bool> has-searched <=> PlayerState.has-searched;
+    in-out property <string> search-error <=> PlayerState.search-error;
+
+    // --- Settings ---
+    in-out property <string> settings-tab <=> PlayerState.settings-tab;
+    in-out property <string> settings-dialog <=> PlayerState.settings-dialog;
+    in-out property <string> rebinding-action <=> PlayerState.rebinding-action;
+    in-out property <string> ui-language <=> PlayerState.ui-language;
+    in-out property <string> ui-language-name <=> PlayerState.ui-language-name;
+    in-out property <string> pref-audio-name <=> PlayerState.pref-audio-name;
+    in-out property <string> pref-sub-name <=> PlayerState.pref-sub-name;
+    in-out property <string> sub-encoding-name <=> PlayerState.sub-encoding-name;
+    in-out property <float> def-volume <=> PlayerState.def-volume;
+    in-out property <float> def-speed <=> PlayerState.def-speed;
+    in-out property <string> pref-audio-lang <=> PlayerState.pref-audio-lang;
+    in-out property <string> pref-sub-lang <=> PlayerState.pref-sub-lang;
+    in-out property <bool> remember-position <=> PlayerState.remember-position;
+    in-out property <bool> auto-play <=> PlayerState.auto-play;
+    in-out property <bool> remember-selections <=> PlayerState.remember-selections;
+    in-out property <int> brightness <=> PlayerState.brightness;
+    in-out property <int> contrast <=> PlayerState.contrast;
+    in-out property <int> saturation <=> PlayerState.saturation;
+    in-out property <float> vid-zoom <=> PlayerState.vid-zoom;
+    in-out property <bool> deinterlace <=> PlayerState.deinterlace;
+    in-out property <bool> volume-boost <=> PlayerState.volume-boost;
+    in-out property <bool> normalization <=> PlayerState.normalization;
+    in-out property <bool> eq-enabled <=> PlayerState.eq-enabled;
+    in-out property <[int]> eq-bands <=> PlayerState.eq-bands;
+    in-out property <string> sub-encoding <=> PlayerState.sub-encoding;
+    in-out property <bool> apply-embedded-styles <=> PlayerState.apply-embedded-styles;
+    in-out property <[ShortcutRow]> shortcuts <=> PlayerState.shortcuts;
+    in-out property <string> app-version <=> PlayerState.app-version;
+    in-out property <int> update-status <=> PlayerState.update-status;
+    in-out property <string> update-detail <=> PlayerState.update-detail;
+
+    // --- Intent callbacks (handled in Rust) ---
+    callback toggle-pause();
+    callback open-file();
+    callback open-url();
+    callback toggle-fullscreen();
+    callback seek-fraction(float);
+    callback adjust-volume(float);
+    callback set-volume(float);
+    callback toggle-mute();
+    callback prev-file();
+    callback next-file();
+    callback pick-speed(float);
+    callback ab-set-a();
+    callback ab-set-b();
+    callback ab-clear();
+    callback request-context-menu(length, length);
+    callback win-minimize();
+    callback win-maximize();
+    callback win-close();
+    callback start-window-drag();
+    callback key(string, bool, bool, bool);
+    callback submit-url(string);
+    // Context-menu actions
+    callback select-sub(int);
+    callback select-audio(int);
+    callback seek-chapter(int);
+    callback set-aspect(string);
+    callback screenshot();
+    callback ab-toggle();
+    callback set-always-on-top(bool);
+    callback open-info();
+    callback set-sleep(int);
+    callback cancel-sleep();
+    // Panel data + actions
+    callback panel-opened(string);
+    callback set-sub-delay(float);
+    callback set-audio-delay(float);
+    callback load-external-sub();
+    callback playlist-play(int);
+    callback playlist-remove(int);
+    callback playlist-add-files();
+    callback playlist-add-folder();
+    callback playlist-clear();
+    callback cycle-repeat();
+    callback toggle-shuffle();
+    callback apply-sub-style();
+    callback reset-sub-style();
+    callback pick-color(string);   // "text" | "border" → seeds + opens the in-app picker
+    callback apply-picked-color(string, color);   // (target, chosen colour) → persist + apply
+    callback set-translate-lang(string);
+    callback translate-off();
+    callback do-search();
+    callback download-sub(int);
+    // Settings actions
+    callback set-ui-language(string);
+    callback set-def-volume(float);
+    callback set-def-speed(float);
+    callback set-pref-audio(string);
+    callback set-pref-sub(string);
+    callback toggle-remember-position();
+    callback toggle-auto-play();
+    callback toggle-remember-selections();
+    callback check-updates();
+    callback install-update();
+    callback relaunch-app();
+    callback open-release-page();
+    callback set-brightness(int);
+    callback set-contrast(int);
+    callback set-saturation(int);
+    callback set-vid-zoom(float);
+    callback toggle-deinterlace();
+    callback reset-video();
+    callback toggle-volume-boost();
+    callback toggle-normalization();
+    callback toggle-eq();
+    callback set-eq(int, int);
+    callback set-eq-preset(string);
+    callback reset-eq();
+    callback set-sub-encoding(string);
+    callback toggle-embedded-styles();
+    callback rebind-key(string, bool, bool, bool);
+    callback reset-shortcuts();
+    callback restore-defaults();
+
+    pure function keyname(t: string) -> string {
+        t == Key.RightArrow ? "ArrowRight"
+        : t == Key.LeftArrow ? "ArrowLeft"
+        : t == Key.UpArrow ? "ArrowUp"
+        : t == Key.DownArrow ? "ArrowDown"
+        : t == Key.Space ? "Space"
+        : t == Key.Escape ? "Escape"
+        : t == Key.F11 ? "F11"
+        : t
+    }
+
+    function close-panels() { root.active-panel = ""; }
+    function toggle-panel(p: string) {
+        root.active-panel = root.active-panel == p ? "" : p;
+        if (root.active-panel != "") {
+            if (p == "sub") { root.sub-page = "main"; }
+            root.panel-opened(p);
+        }
+    }
+
+    // Auto-hide the controls + cursor after idle while playing in fullscreen.
+    changed fullscreen => {
+        if (!self.fullscreen) { root.controls-visible = true; root.cursor-hidden = false; }
+    }
+    // Only ticks while it can actually do something (fullscreen playback), so a
+    // windowed or paused player isn't forced to repaint 4×/s.
+    hide-timer := Timer {
+        interval: 250ms;
+        running: root.has-file && root.fullscreen && root.playing;
+        triggered => {
+            root.idle-ticks += 1;
+            if (root.idle-ticks >= 10 && root.active-panel == "" && !root.ctx-show && !root.url-show) {
+                root.controls-visible = false;
+                root.cursor-hidden = true;
+            }
+        }
+    }
+
+    // Auto-dismiss a translation error after a few seconds (still cleared
+    // instantly on a retry or a new file). Long enough to read, no clutter.
+    err-timer := Timer {
+        interval: 7s;
+        running: root.tr-error != "";
+        triggered => { root.tr-error = ""; }
+    }
+
+    // Auto-dismiss the transient toast after a few seconds (also cleared on tap).
+    toast-timer := Timer {
+        interval: 4s;
+        running: root.toast != "";
+        triggered => { root.toast = ""; }
+    }
+
+    forward-focus: keyfocus;
+    keyfocus := FocusScope {
+        key-pressed(e) => {
+            if (root.rebinding-action != "") {
+                // Capturing a new shortcut.
+                if (e.text == Key.Escape) {
+                    root.rebinding-action = "";
+                } else if (e.text != Key.Control && e.text != Key.Shift && e.text != Key.Alt) {
+                    root.rebind-key(root.keyname(e.text), e.modifiers.control, e.modifiers.shift, e.modifiers.alt);
+                    root.rebinding-action = "";
+                }
+            } else if (e.text == Key.Escape && root.ctx-show) {
+                root.ctx-show = false;
+            } else if (e.text == Key.Escape && root.active-panel != "") {
+                root.close-panels();
+            } else {
+                root.key(root.keyname(e.text), e.modifiers.control, e.modifiers.shift, e.modifiers.alt);
+            }
+            accept
+        }
+    }
+
+    // Video surface + whole-window input.
+    Rectangle {
+        background: root.has-file ? transparent : #000000;
+        area := TouchArea {
+            mouse-cursor: root.cursor-hidden ? MouseCursor.none : MouseCursor.default;
+            double-clicked => { root.toggle-fullscreen(); }
+            pointer-event(e) => {
+                if (e.kind == PointerEventKind.move) {
+                    root.idle-ticks = 0;
+                    root.cursor-hidden = false;
+                    if (!root.fullscreen) { root.controls-visible = true; }
+                    else { root.controls-visible = self.mouse-y <= 50px || self.mouse-y >= root.height - 80px; }
+                } else if (e.kind == PointerEventKind.down) {
+                    if (e.button == PointerEventButton.right) {
+                        root.request-context-menu(self.mouse-x, self.mouse-y);
+                    } else if (e.button == PointerEventButton.left) {
+                        root.close-panels();
+                    }
+                }
+            }
+            scroll-event(e) => { root.adjust-volume(e.delta-y > 0 ? 5 : -5); accept }
+        }
+
+        if !root.has-file: VerticalLayout {
+            alignment: center;
+            spacing: 6px;
+            HorizontalLayout { alignment: center; AppIcon { data: Ic.play-circle; size: 72px; color: #ffffff44; } }
+            HorizontalLayout { alignment: center; Text { text: "Vayou"; color: #ffffff66; font-size: 14px; } }
+        }
+    }
+
+    // --- Title bar ---
+    if root.controls-visible: Rectangle {
+        y: 0;
+        height: 36px;
+        background: @linear-gradient(180deg, #000000b3 0%, #00000000 100%);
+        // Drag-to-move surface (behind the buttons, which capture their own
+        // clicks). A left press hands the move loop to Windows via win::start_drag.
+        TouchArea {
+            pointer-event(e) => {
+                if (e.kind == PointerEventKind.down && e.button == PointerEventButton.left) {
+                    root.start-window-drag();
+                }
+            }
+        }
+        HorizontalLayout {
+            padding-left: 12px;
+            padding-right: 12px;
+            spacing: 2px;
+            VerticalLayout {
+                alignment: center;
+                CtrlButton {
+                    width: 28px; height: 28px; icon: Ic.menu; icon-size: 16px; square-hover: true;
+                    clicked => { root.request-context-menu(8px, 40px); }
+                }
+            }
+            Text {
+                text: root.media-title == "" ? "Vayou" : root.media-title;
+                color: #ffffffcc; font-size: 12px; vertical-alignment: center;
+                horizontal-stretch: 1; overflow: elide;
+            }
+            // Centered like the menu button on the left (a bare CtrlButton in the
+            // HorizontalLayout aligns to the top, sitting higher than the menu).
+            VerticalLayout {
+                alignment: center;
+                HorizontalLayout {
+                    spacing: 2px;
+                    CtrlButton { width: 32px; height: 28px; icon: Ic.win-min; icon-size: 16px; square-hover: true; clicked => { root.win-minimize(); } }
+                    CtrlButton { width: 32px; height: 28px; icon: Ic.win-max; icon-size: 14px; square-hover: true; clicked => { root.win-maximize(); } }
+                    CtrlButton { width: 32px; height: 28px; icon: Ic.close-x; icon-size: 16px; square-hover: true; danger: true; clicked => { root.win-close(); } }
+                }
+            }
+        }
+    }
+
+    // --- Bottom controls ---
+    if root.controls-visible: Rectangle {
+        y: parent.height - self.height;
+        height: bottombox.preferred-height;
+        background: @linear-gradient(180deg, #00000000 0%, #000000cc 100%);
+        bottombox := VerticalLayout {
+            padding-left: 16px;
+            padding-right: 16px;
+            padding-top: 8px;
+            padding-bottom: 6px;
+            spacing: 4px;
+
+            // A-B loop bar
+            if root.ab-enabled: HorizontalLayout {
+                spacing: 6px;
+                height: 32px;
+                ab-pill := Rectangle {
+                    width: 64px;
+                    border-radius: Theme.radius-sm;
+                    background: root.ab-a >= 0 ? Theme.accent : #ffffff26;
+                    TouchArea { clicked => { root.ab-set-a(); } }
+                    Text {
+                        text: root.ab-a >= 0 ? "A \{Catalog.fmt-time(root.ab-a)}" : "A";
+                        color: root.ab-a >= 0 ? black : white;
+                        font-size: 12px; font-weight: 600;
+                        horizontal-alignment: center; vertical-alignment: center;
+                    }
+                }
+                Rectangle {
+                    width: 64px;
+                    border-radius: Theme.radius-sm;
+                    background: root.ab-b >= 0 ? Theme.accent : #ffffff26;
+                    opacity: root.ab-a >= 0 ? 1.0 : 0.3;
+                    TouchArea { clicked => { if (root.ab-a >= 0) { root.ab-set-b(); } } }
+                    Text {
+                        text: root.ab-b >= 0 ? "B \{Catalog.fmt-time(root.ab-b)}" : "B";
+                        color: root.ab-b >= 0 ? black : white;
+                        font-size: 12px; font-weight: 600;
+                        horizontal-alignment: center; vertical-alignment: center;
+                    }
+                }
+                CtrlButton { icon: Ic.close-x; icon-size: 16px; width: 32px; height: 32px; clicked => { root.ab-clear(); } }
+                Rectangle {}
+            }
+
+            // Seek bar
+            Rectangle {
+                height: 16px;
+                seek := TouchArea {
+                    // Move the playhead optimistically so the thumb tracks the
+                    // cursor instantly; mpv catches up via the (throttled) time-pos.
+                    clicked => {
+                        if (root.duration > 0) {
+                            root.current-time = clamp(self.mouse-x / self.width, 0, 1) * root.duration;
+                            root.seek-fraction(clamp(self.mouse-x / self.width, 0, 1));
+                        }
+                    }
+                    moved => {
+                        if (self.pressed && root.duration > 0) {
+                            root.current-time = clamp(self.mouse-x / self.width, 0, 1) * root.duration;
+                            root.seek-fraction(clamp(self.mouse-x / self.width, 0, 1));
+                        }
+                    }
+                }
+                track := Rectangle {
+                    y: parent.height / 2 - 2px;
+                    height: seek.has-hover ? 5px : 4px;
+                    background: Theme.surface-container-highest;
+                    border-radius: 2px;
+                    animate height { duration: 100ms; }
+                    // played progress
+                    Rectangle {
+                        x: 0;
+                        width: parent.width * (root.duration > 0 ? root.current-time / root.duration : 0);
+                        height: parent.height;
+                        background: Theme.accent;
+                        border-radius: 2px;
+                    }
+                    // A-B region
+                    if root.ab-a >= 0 && root.duration > 0: Rectangle {
+                        x: parent.width * (root.ab-a / root.duration);
+                        width: parent.width * ((root.ab-b >= 0 ? root.ab-b / root.duration : 1) - root.ab-a / root.duration);
+                        height: parent.height;
+                        background: #ffffff40;
+                    }
+                    // chapter ticks
+                    for ch in root.chapters: Rectangle {
+                        x: parent.width * (root.duration > 0 ? ch.time / root.duration : 0);
+                        width: 2px;
+                        height: parent.height;
+                        background: #ffffff66;
+                    }
+                }
+                // thumb
+                Rectangle {
+                    width: 12px; height: 12px; border-radius: 6px; background: white;
+                    x: (parent.width - self.width) * (root.duration > 0 ? root.current-time / root.duration : 0);
+                    y: parent.height / 2 - self.height / 2;
+                }
+            }
+
+            // Control row
+            HorizontalLayout {
+                spacing: 2px;
+                CtrlButton { icon: root.playing ? Ic.pause : Ic.play; clicked => { root.toggle-pause(); } }
+                CtrlButton { icon: Ic.prev; clicked => { root.prev-file(); } }
+                CtrlButton { icon: Ic.next; clicked => { root.next-file(); } }
+
+                // Volume: mute + slider as one unit (YouTube-style)
+                VerticalLayout {
+                    alignment: center;
+                    VolumeControl {
+                        volume: root.volume;
+                        maximum: root.max-volume;
+                        muted: root.muted;
+                        icon-on: Ic.volume-on;
+                        icon-off: Ic.volume-off;
+                        toggle-mute => { root.toggle-mute(); }
+                        set-volume(v) => { root.set-volume(v); }
+                    }
+                }
+
+                VerticalLayout {
+                    alignment: center;
+                    TouchArea {
+                        width: timetext.preferred-width + 8px;
+                        clicked => { root.show-remaining = !root.show-remaining; }
+                        timetext := Text {
+                            text: (root.show-remaining && root.duration > 0)
+                                ? "-\{Catalog.fmt-time(root.duration - root.current-time)} / \{Catalog.fmt-time(root.duration)}"
+                                : "\{Catalog.fmt-time(root.current-time)} / \{Catalog.fmt-time(root.duration)}";
+                            color: #ffffffb3; font-size: 12px; vertical-alignment: center;
+                        }
+                    }
+                }
+
+                Rectangle {}  // spacer
+
+                CtrlButton { icon: Ic.subtitles; active: root.active-panel == "sub"; clicked => { root.toggle-panel("sub"); } }
+                CtrlButton { icon: Ic.audio; active: root.active-panel == "audio"; clicked => { root.toggle-panel("audio"); } }
+                // Speed
+                VerticalLayout {
+                    alignment: center;
+                    spdbtn := TouchArea {
+                        width: 40px; height: 36px;
+                        clicked => { root.toggle-panel("speed"); }
+                        Rectangle {
+                            background: spdbtn.has-hover ? #ffffff2e : transparent;
+                            border-radius: self.height / 2;
+                            Text {
+                                text: "\{root.speed}x";
+                                color: root.active-panel == "speed" ? Theme.accent : #ffffffe6;
+                                font-size: 13px; font-weight: 500;
+                                horizontal-alignment: center; vertical-alignment: center;
+                            }
+                        }
+                    }
+                }
+                CtrlButton { icon: Ic.playlist; active: root.active-panel == "playlist"; clicked => { root.toggle-panel("playlist"); } }
+                CtrlButton { icon: Ic.settings; active: root.active-panel == "settings"; clicked => { root.toggle-panel("settings"); } }
+                CtrlButton { icon: Ic.fullscreen; clicked => { root.toggle-fullscreen(); } }
+            }
+        }
+    }
+
+    // --- Transient toast (top-center, above the controls; tap to dismiss) ---
+    if root.toast != "": HorizontalLayout {
+        x: 0; y: 48px; width: 100%; height: 34px;
+        alignment: center;
+        Rectangle {
+            background: #1e1e1ef2;
+            border-radius: Theme.radius-sm;
+            border-width: 1px;
+            border-color: #ffffff1f;
+            TouchArea { clicked => { root.toast = ""; } }
+            HorizontalLayout {
+                padding-left: 16px; padding-right: 16px;
+                Text { text: root.toast; color: #ffffffe6; font-size: 12px; vertical-alignment: center; }
+            }
+        }
+    }
+
+    // --- Speed dropdown ---
+    if root.active-panel == "speed": MenuSurface {
+        x: parent.width - self.width - 92px;
+        y: parent.height - self.height - 56px;
+        width: 120px;
+        height: speedlist.preferred-height + 12px;
+        speedlist := VerticalLayout {
+            padding-top: 6px; padding-bottom: 6px;
+            for s in Catalog.speeds: MenuItem {
+                show-check: true; checked: root.speed == s; active: root.speed == s;
+                label: "\{s}x";
+                clicked => { root.pick-speed(s); root.close-panels(); }
+            }
+        }
+    }
+
+    // --- Audio panel ---
+    if root.active-panel == "audio": SidePanel {
+        heading: @tr("Audio");
+        close => { root.close-panels(); }
+        x: parent.width - self.width - 16px;
+        y: parent.height - self.height - 64px;
+        ScrollView {
+            // Cap relative to the window so the panel never overflows a short,
+            // non-maximized player (mirrors how the Settings modal sizes itself).
+            height: min(aulist.preferred-height, min(280px, root.height - 200px));
+            aulist := VerticalLayout {
+                for t in root.panel-audio-tracks: MenuItem { show-check: true; checked: t.selected; active: t.selected; label: t.label; clicked => { root.select-audio(t.id); } }
+            }
+        }
+        if root.panel-audio-tracks.length == 0: Text { text: @tr("No audio tracks"); color: #ffffff4d; font-size: 12px; height: 48px; horizontal-alignment: center; vertical-alignment: center; }
+        MenuSep {}
+        Stepper {
+            label: @tr("Delay"); value: "\{round(root.audio-delay * 10) / 10}s";
+            dec => { root.audio-delay = round((root.audio-delay - 0.1) * 10) / 10; root.set-audio-delay(root.audio-delay); }
+            inc => { root.audio-delay = round((root.audio-delay + 0.1) * 10) / 10; root.set-audio-delay(root.audio-delay); }
+        }
+    }
+
+    // --- Playlist panel ---
+    if root.active-panel == "playlist": SidePanel {
+        heading: @tr("Playlist");
+        panel-width: 340px;
+        close => { root.close-panels(); }
+        x: parent.width - self.width - 16px;
+        y: parent.height - self.height - 64px;
+        ScrollView {
+            // Cap relative to the window so a long playlist never overflows a
+            // short, non-maximized player (like the Settings modal does).
+            height: clamp(pllist.preferred-height, 40px, min(360px, root.height - 200px));
+            pllist := VerticalLayout {
+                for item[i] in root.playlist-items: Rectangle {
+                    height: 32px;
+                    pa := TouchArea { double-clicked => { root.playlist-play(item.index); } }
+                    background: pa.has-hover ? #ffffff14 : (item.current ? #ffffff0d : transparent);
+                    HorizontalLayout {
+                        padding-left: 12px; padding-right: 6px; spacing: 8px;
+                        Rectangle {
+                            width: 18px;
+                            if item.current: AppIcon {
+                                x: (parent.width - self.width) / 2;
+                                y: (parent.height - self.height) / 2;
+                                data: Ic.play; size: 11px; color: Theme.accent;
+                            }
+                            if !item.current: Text {
+                                width: 100%; height: 100%;
+                                text: "\{i + 1}"; color: #ffffff40; font-size: 11px;
+                                horizontal-alignment: center; vertical-alignment: center;
+                            }
+                        }
+                        Text { text: item.title; color: item.current ? Theme.accent : #ffffffcc; font-size: 12px; vertical-alignment: center; horizontal-stretch: 1; overflow: elide; }
+                        // Remove-from-playlist X (always visible, brightens on row
+                        // hover, turns red when hovered directly).
+                        VerticalLayout {
+                            alignment: center;
+                            rmta := TouchArea {
+                                width: 26px; height: 26px;
+                                clicked => { root.playlist-remove(item.index); }
+                                Rectangle {
+                                    background: rmta.has-hover ? #ef444433 : transparent;
+                                    border-radius: Theme.radius-sm;
+                                    AppIcon {
+                                        x: (parent.width - self.width) / 2;
+                                        y: (parent.height - self.height) / 2;
+                                        data: Ic.close-x;
+                                        size: 13px;
+                                        color: rmta.has-hover ? #ef4444 : (pa.has-hover ? #ffffffcc : #ffffff45);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if root.playlist-items.length == 0: Text { text: @tr("Empty playlist"); color: #ffffff4d; font-size: 12px; height: 64px; horizontal-alignment: center; vertical-alignment: center; }
+            }
+        }
+        MenuSep {}
+        HorizontalLayout {
+            padding: 6px; spacing: 2px;
+            CtrlButton { width: 30px; height: 30px; icon-size: 16px; icon: Ic.shuffle; active: root.shuffle; clicked => { root.toggle-shuffle(); } }
+            CtrlButton { width: 30px; height: 30px; icon-size: 16px; icon: Ic.repeat; active: root.repeat-mode != "off"; clicked => { root.cycle-repeat(); } }
+            Rectangle {}
+            CtrlButton { width: 30px; height: 30px; icon-size: 16px; icon: Ic.plus; clicked => { root.playlist-add-files(); } }
+            CtrlButton { width: 30px; height: 30px; icon-size: 16px; icon: Ic.add-folder; clicked => { root.playlist-add-folder(); } }
+            CtrlButton { width: 30px; height: 30px; icon-size: 16px; icon: Ic.trash; clicked => { root.playlist-clear(); } }
+        }
+    }
+
+    // --- Media info panel ---
+    if root.active-panel == "info": SidePanel {
+        heading: @tr("Media Info");
+        close => { root.close-panels(); }
+        x: parent.width - self.width - 16px;
+        y: parent.height - self.height - 64px;
+        VerticalLayout {
+            padding: Theme.pad; spacing: 6px;
+            for row in root.info-rows: HorizontalLayout {
+                spacing: 12px;
+                height: 18px;
+                Text { text: row.label; color: #ffffff80; font-size: 12px; vertical-alignment: center; }
+                Rectangle {}
+                Text { text: row.value; color: #ffffffe6; font-size: 12px; vertical-alignment: center; overflow: elide; max-width: 170px; }
+            }
+        }
+    }
+
+    // --- Subtitle panel (multi-page) ---
+    if root.active-panel == "sub": SubtitlePanel {
+        x: parent.width - self.width - 16px;
+        y: parent.height - self.height - 64px;
+        reset-sub-style => { root.reset-sub-style(); }
+        select-sub(id) => { root.select-sub(id); }
+        load-external-sub => { root.load-external-sub(); }
+        do-search => { root.do-search(); }
+        apply-sub-style => { root.apply-sub-style(); }
+        pick-color(t) => { root.pick-color(t); }
+        translate-off => { root.translate-off(); }
+        set-translate-lang(c) => { root.set-translate-lang(c); }
+        set-sub-delay(v) => { root.set-sub-delay(v); }
+        download-sub(i) => { root.download-sub(i); }
+    }
+
+    // --- Settings (centered modal) ---
+    if root.active-panel == "settings": SettingsPanel {
+        toggle-auto-play => { root.toggle-auto-play(); }
+        toggle-remember-position => { root.toggle-remember-position(); }
+        toggle-remember-selections => { root.toggle-remember-selections(); }
+        reset-video => { root.reset-video(); }
+        set-brightness(v) => { root.set-brightness(v); }
+        set-contrast(v) => { root.set-contrast(v); }
+        set-saturation(v) => { root.set-saturation(v); }
+        set-vid-zoom(v) => { root.set-vid-zoom(v); }
+        toggle-deinterlace => { root.toggle-deinterlace(); }
+        set-def-volume(v) => { root.set-def-volume(v); }
+        toggle-volume-boost => { root.toggle-volume-boost(); }
+        toggle-normalization => { root.toggle-normalization(); }
+        toggle-eq => { root.toggle-eq(); }
+        set-eq-preset(p) => { root.set-eq-preset(p); }
+        reset-eq => { root.reset-eq(); }
+        set-eq(i, v) => { root.set-eq(i, v); }
+        reset-sub-style => { root.reset-sub-style(); }
+        apply-sub-style => { root.apply-sub-style(); }
+        pick-color(t) => { root.pick-color(t); }
+        toggle-embedded-styles => { root.toggle-embedded-styles(); }
+        reset-shortcuts => { root.reset-shortcuts(); }
+        open-release-page => { root.open-release-page(); }
+        relaunch-app => { root.relaunch-app(); }
+        install-update => { root.install-update(); }
+        check-updates => { root.check-updates(); }
+        restore-defaults => { root.restore-defaults(); }
+        set-ui-language(c) => { root.set-ui-language(c); }
+        set-def-speed(s) => { root.set-def-speed(s); }
+        set-pref-audio(c) => { root.set-pref-audio(c); }
+        set-pref-sub(c) => { root.set-pref-sub(c); }
+        set-sub-encoding(c) => { root.set-sub-encoding(c); }
+    }
+
+
+    // --- Open URL modal ---
+    if root.url-show: Rectangle {
+        background: #00000066;
+        TouchArea { clicked => { root.url-show = false; } }
+        MenuSurface {
+            width: 460px;
+            height: 130px;
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            TouchArea {}
+            VerticalLayout {
+                padding: 16px; spacing: 12px;
+                Text { text: @tr("Open URL"); color: #ffffffe6; font-size: 14px; font-weight: 600; }
+                Rectangle {
+                    height: 32px; background: #ffffff14; border-radius: Theme.radius-sm;
+                    border-width: 1px; border-color: ut.has-focus ? Theme.accent : Theme.outline;
+                    HorizontalLayout {
+                        padding-left: Theme.pad; padding-right: Theme.pad;
+                        ut := TextInput {
+                            text <=> root.url-text;
+                            color: white; font-size: 12px; vertical-alignment: center; single-line: true; horizontal-stretch: 1;
+                            accepted => { root.submit-url(root.url-text); root.url-text = ""; }
+                        }
+                    }
+                }
+                HorizontalLayout {
+                    spacing: 8px; alignment: end;
+                    TouchArea { width: 80px; height: 30px; clicked => { root.url-show = false; }
+                        Rectangle { background: #ffffff10; border-radius: Theme.radius-sm; Text { text: @tr("Cancel"); color: #ffffffb3; font-size: 12px; horizontal-alignment: center; vertical-alignment: center; } } }
+                    TouchArea { width: 80px; height: 30px; clicked => { root.submit-url(root.url-text); root.url-text = ""; }
+                        Rectangle { background: Theme.accent; border-radius: Theme.radius-sm; Text { text: @tr("OK"); color: black; font-size: 12px; font-weight: 600; horizontal-alignment: center; vertical-alignment: center; } } }
+                }
+            }
+        }
+    }
+
+    // --- Context menu (right-click / hamburger) ---
+    if root.ctx-show: ContextMenu {
+        open-file => { root.open-file(); }
+        open-url => { root.open-url(); }
+        ab-toggle => { root.ab-toggle(); }
+        screenshot => { root.screenshot(); }
+        open-info => { root.open-info(); }
+        set-always-on-top(v) => { root.set-always-on-top(v); }
+        select-sub(id) => { root.select-sub(id); }
+        select-audio(id) => { root.select-audio(id); }
+        pick-speed(s) => { root.pick-speed(s); }
+        seek-chapter(i) => { root.seek-chapter(i); }
+        set-aspect(v) => { root.set-aspect(v); }
+        set-sleep(m) => { root.set-sleep(m); }
+        cancel-sleep => { root.cancel-sleep(); }
+    }
+
+    // Colour picker overlay, above all panels/menus.
+    if root.cp-show: Rectangle {
+        background: #00000066;
+        TouchArea { clicked => { root.cp-show = false; } }
+        ColorPicker {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            hue <=> root.cp-hue;
+            sat <=> root.cp-sat;
+            val <=> root.cp-val;
+            done => {
+                root.apply-picked-color(root.cp-target, self.current);
+                root.cp-show = false;
+            }
+            cancel => { root.cp-show = false; }
+        }
+    }
+}

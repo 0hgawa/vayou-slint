@@ -1,0 +1,445 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: it\n"
+
+msgid "Open File"
+msgstr "Apri File"
+
+msgid "Open URL"
+msgstr "Apri URL"
+
+msgid "Pause"
+msgstr "Pausa"
+
+msgid "Play"
+msgstr "Riproduci"
+
+msgid "Stop"
+msgstr "Ferma"
+
+msgid "Subtitles"
+msgstr "Sottotitoli"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Speed"
+msgstr "Velocità"
+
+msgid "Chapters"
+msgstr "Capitoli"
+
+msgid "Aspect Ratio"
+msgstr "Rapporto d'Aspetto"
+
+msgid "A-B Loop"
+msgstr "Loop A-B"
+
+msgid "Set A"
+msgstr "Imposta A"
+
+msgid "Set B"
+msgstr "Imposta B"
+
+msgid "Screenshot"
+msgstr "Cattura Schermo"
+
+msgid "Screenshot saved"
+msgstr "Cattura salvata"
+
+msgid "Media Info"
+msgstr "Info Media"
+
+msgid "Settings"
+msgstr "Impostazioni"
+
+msgid "Always on Top"
+msgstr "Sempre in Primo Piano"
+
+msgid "Sleep Timer"
+msgstr "Timer di Spegnimento"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Off"
+msgstr "Spento"
+
+msgid "Auto"
+msgstr "Auto"
+
+msgid "No subtitle tracks"
+msgstr "Nessuna traccia sottotitoli"
+
+msgid "No audio tracks"
+msgstr "Nessuna traccia audio"
+
+msgid "Disable"
+msgstr "Disattiva"
+
+msgid "Open local subtitle"
+msgstr "Apri sottotitolo locale"
+
+msgid "ON"
+msgstr "ACCESO"
+
+msgid "Delay"
+msgstr "Ritardo"
+
+msgid "Translate"
+msgstr "Traduci"
+
+msgid "Style"
+msgstr "Stile"
+
+msgid "Reset"
+msgstr "Ripristina"
+
+msgid "Font"
+msgstr "Carattere"
+
+msgid "Size"
+msgstr "Dimensione"
+
+msgid "Text Color"
+msgstr "Colore del Testo"
+
+msgid "Border Color"
+msgstr "Colore del Bordo"
+
+msgid "Border Size"
+msgstr "Dimensione del Bordo"
+
+msgid "Position"
+msgstr "Posizione"
+
+msgid "Text"
+msgstr "Testo"
+
+msgid "Bold"
+msgstr "Grassetto"
+
+msgid "Border"
+msgstr "Bordo"
+
+msgid "Playlist"
+msgstr "Playlist"
+
+msgid "Empty playlist"
+msgstr "Playlist vuota"
+
+msgid "+ Files"
+msgstr "+ File"
+
+msgid "+ Folder"
+msgstr "+ Cartella"
+
+msgid "Clear"
+msgstr "Svuota"
+
+msgid "Remove"
+msgstr "Rimuovi"
+
+msgid "Shuffle"
+msgstr "Casuale"
+
+msgid "Repeat"
+msgstr "Ripeti"
+
+msgid "items"
+msgstr "elementi"
+
+msgid "Search online..."
+msgstr "Cerca online..."
+
+msgid "Search Online"
+msgstr "Cerca Online"
+
+msgid "Search subtitle"
+msgstr "Cerca sottotitolo"
+
+msgid "Searching..."
+msgstr "Ricerca in corso..."
+
+msgid "No results"
+msgstr "Nessun risultato"
+
+msgid "Download failed"
+msgstr "Download non riuscito"
+
+msgid "File"
+msgstr "File"
+
+msgid "Resolution"
+msgstr "Risoluzione"
+
+msgid "Video Codec"
+msgstr "Codec Video"
+
+msgid "Audio Codec"
+msgstr "Codec Audio"
+
+msgid "FPS"
+msgstr "FPS"
+
+msgid "Video Bitrate"
+msgstr "Bitrate Video"
+
+msgid "Audio Bitrate"
+msgstr "Bitrate Audio"
+
+msgid "Duration"
+msgstr "Durata"
+
+msgid "File Size"
+msgstr "Dimensione File"
+
+msgid "General"
+msgstr "Generale"
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Language"
+msgstr "Lingua"
+
+msgid "Preferred Audio Language"
+msgstr "Audio Preferito"
+
+msgid "Preferred Subtitle Language"
+msgstr "Sottotitolo Preferito"
+
+msgid "Deinterlace"
+msgstr "Deinterlaccia"
+
+msgid "Default Volume"
+msgstr "Volume Predefinito"
+
+msgid "Default Speed"
+msgstr "Velocità Predefinita"
+
+msgid "Remember Position"
+msgstr "Ricorda Posizione"
+
+msgid "Auto Play"
+msgstr "Riproduzione Automatica"
+
+msgid "Remember Audio/Subtitle"
+msgstr "Ricorda Audio/Sottotitolo"
+
+msgid "Subtitle Encoding"
+msgstr "Codifica Sottotitolo"
+
+msgid "Color"
+msgstr "Colore"
+
+msgid "Brightness"
+msgstr "Luminosità"
+
+msgid "Contrast"
+msgstr "Contrasto"
+
+msgid "Saturation"
+msgstr "Saturazione"
+
+msgid "Zoom"
+msgstr "Zoom"
+
+msgid "Normalization"
+msgstr "Normalizzazione"
+
+msgid "Volume Boost"
+msgstr "Aumento del Volume"
+
+msgid "Equalizer"
+msgstr "Equalizzatore"
+
+msgid "Apply Embedded Styles"
+msgstr "Applica Stili Integrati"
+
+msgid "Restore Defaults"
+msgstr "Ripristina Valori Predefiniti"
+
+msgid "Previous"
+msgstr "Precedente"
+
+msgid "Next"
+msgstr "Successivo"
+
+msgid "Fullscreen"
+msgstr "Schermo Intero"
+
+msgid "Playback speed"
+msgstr "Velocità di riproduzione"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Minimize"
+msgstr "Riduci a icona"
+
+msgid "Maximize"
+msgstr "Ingrandisci"
+
+msgid "Close"
+msgstr "Chiudi"
+
+msgid "Play / Pause"
+msgstr "Riproduci / Pausa"
+
+msgid "Seek Forward (5s)"
+msgstr "Avanti (5s)"
+
+msgid "Seek Forward (30s)"
+msgstr "Avanti (30s)"
+
+msgid "Seek Back (5s)"
+msgstr "Indietro (5s)"
+
+msgid "Seek Back (30s)"
+msgstr "Indietro (30s)"
+
+msgid "Frame Step"
+msgstr "Fotogramma Avanti"
+
+msgid "Frame Back"
+msgstr "Fotogramma Indietro"
+
+msgid "Speed Up"
+msgstr "Aumenta Velocità"
+
+msgid "Speed Down"
+msgstr "Riduci Velocità"
+
+msgid "Volume Up"
+msgstr "Alza Volume"
+
+msgid "Volume Down"
+msgstr "Abbassa Volume"
+
+msgid "Mute"
+msgstr "Muto"
+
+msgid "Cycle Subtitles"
+msgstr "Cambia Sottotitoli"
+
+msgid "Cycle Audio"
+msgstr "Cambia Traccia Audio"
+
+msgid "Shortcuts"
+msgstr "Scorciatoie"
+
+msgid "Playback"
+msgstr "Riproduzione"
+
+msgid "Volume"
+msgstr "Volume"
+
+msgid "Tracks"
+msgstr "Tracce"
+
+msgid "Navigation"
+msgstr "Navigazione"
+
+msgid "Reset All Shortcuts"
+msgstr "Ripristina Tutte le Scorciatoie"
+
+msgid "Press a key..."
+msgstr "Premi un tasto..."
+
+msgid "Drop file to play"
+msgstr "Rilascia il file per riprodurre"
+
+msgid "Vayou"
+msgstr "Vayou"
+
+msgid "Drop a file here or press"
+msgstr "Rilascia un file qui o premi"
+
+msgid "to open"
+msgstr "per aprire"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "About"
+msgstr "Di"
+
+msgid "Interface"
+msgstr "Interfaccia"
+
+msgid "Output"
+msgstr "Uscita"
+
+msgid "Flat"
+msgstr "Piatto"
+
+msgid "Bass"
+msgstr "Basso"
+
+msgid "Treble"
+msgstr "Alti"
+
+msgid "Vocal"
+msgstr "Vocale"
+
+msgid "Rock"
+msgstr "Roccia"
+
+msgid "Native video player"
+msgstr "Lettore video nativo"
+
+msgid "Updates"
+msgstr "Aggiornamenti"
+
+msgid "Application updates"
+msgstr "Aggiornamenti dell'applicazione"
+
+msgid "Checking…"
+msgstr "Controllo…"
+
+msgid "You're on the latest version."
+msgstr "Sei sull'ultima versione."
+
+msgid "Downloading and verifying…"
+msgstr "Download e verifica…"
+
+msgid "Update installed — restart to apply."
+msgstr "Aggiornamento installato: riavvia per applicare."
+
+msgid "Check whether a newer version is available."
+msgstr "Controlla se è disponibile una versione più recente."
+
+msgid "Open releases page"
+msgstr "Apri la pagina delle versioni"
+
+msgid "Restart now"
+msgstr "Ricomincia adesso"
+
+msgid "Install"
+msgstr "Installare"
+
+msgid "Installing…"
+msgstr "Installazione…"
+
+msgid "Check for updates"
+msgstr "Controlla gli aggiornamenti"
+
+msgid "Restore defaults"
+msgstr "Ripristina le impostazioni predefinite"
+
+msgid "Reset every setting to its default value."
+msgstr "Ripristina ogni impostazione al valore predefinito."
+
+msgid "Done"
+msgstr "Fatto"
+
+msgid "{} min"
+msgstr "{} min"
+
+msgid "Version {} is available."
+msgstr "È disponibile la versione {}."
+
+msgid "Couldn't update: {}"
+msgstr "Impossibile aggiornare: {}"

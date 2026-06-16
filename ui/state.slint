@@ -1,0 +1,190 @@
+// Shared UI state + data types, separated from the MainWindow composition so the
+// extracted panels (settings/subtitle/context-menu) can read and write the same
+// state without threading dozens of properties through component interfaces.
+//
+// `PlayerState` is the single source of truth for the Rust-facing UI state. The
+// `MainWindow` re-exposes each field as an aliased property (`<=> PlayerState.x`)
+// so the native (Rust) bridge keeps its existing `ui.set_*/get_*` API unchanged,
+// while every Slint component reads/writes `PlayerState.x` directly.
+//
+// Callbacks intentionally stay on the components (forwarded by the MainWindow)
+// rather than living here: aliasing a global callback is deprecated in Slint.
+
+export struct ChapterRow {
+    time: float,
+    title: string,
+    current: bool,
+}
+
+export struct TrackRow {
+    id: int,
+    label: string,
+    selected: bool,
+}
+
+export struct RatioRow {
+    value: string,
+    label: string,
+}
+
+export struct PlaylistRow {
+    index: int,
+    title: string,
+    current: bool,
+}
+
+export struct SubSearchRow {
+    name: string,
+    lang: string,
+    downloads: string,
+    matched: string,
+}
+
+export struct NamedLang {
+    code: string,
+    name: string,
+}
+
+export struct InfoRow {
+    label: string,
+    value: string,
+}
+
+export struct ShortcutRow {
+    action: string,
+    key: string,
+    category: string,
+    first-in-category: bool,
+}
+
+export global PlayerState {
+    // --- Player state (pushed from Rust) ---
+    in-out property <bool> playing;
+    in-out property <float> current-time;
+    in-out property <float> duration;
+    in-out property <float> volume;
+    in-out property <bool> muted;
+    in-out property <float> speed: 1.0;
+    in-out property <bool> fullscreen;
+    in-out property <bool> has-file;
+    in-out property <string> media-title;
+    in-out property <float> max-volume: 100;
+    in-out property <float> ab-a: -1;
+    in-out property <float> ab-b: -1;
+    in-out property <bool> ab-enabled;
+    in-out property <[ChapterRow]> chapters;
+
+    // --- UI state ---
+    in-out property <bool> controls-visible: true;
+    in-out property <string> active-panel;
+    in-out property <bool> url-show;
+    in-out property <string> url-text;
+    in-out property <string> toast;
+
+    // --- Context menu ---
+    in-out property <bool> ctx-show;
+    in-out property <length> ctx-x;
+    in-out property <length> ctx-y;
+    in-out property <string> ctx-page: "main";
+    in-out property <[TrackRow]> ctx-sub-tracks;
+    in-out property <[TrackRow]> ctx-audio-tracks;
+    in-out property <string> current-aspect: "-1";
+    in-out property <bool> pinned;
+    in-out property <int> sleep-min;
+    in-out property <string> sleep-remaining;
+
+    // --- Panels ---
+    in-out property <[TrackRow]> panel-sub-tracks;
+    in-out property <[TrackRow]> panel-audio-tracks;
+    in-out property <bool> sub-active;
+    in-out property <float> sub-delay;
+    in-out property <float> audio-delay;
+    in-out property <[PlaylistRow]> playlist-items;
+    in-out property <string> repeat-mode: "off";
+    in-out property <bool> shuffle;
+    in-out property <[InfoRow]> info-rows;
+    in-out property <string> sub-page: "main";
+
+    // Subtitle style
+    in-out property <string> sub-font: "Segoe UI";
+    in-out property <int> sub-size: 55;
+    in-out property <bool> sub-bold;
+    in-out property <color> sub-color: white;
+    in-out property <color> sub-border-color: black;
+    in-out property <string> sub-color-hex: "#ffffff";
+    in-out property <string> sub-border-color-hex: "#000000";
+    in-out property <bool> cp-show;
+    in-out property <string> cp-target;
+    in-out property <float> cp-hue;
+    in-out property <float> cp-sat;
+    in-out property <float> cp-val;
+    in-out property <int> sub-border-size: 3;
+    in-out property <int> sub-position: 100;
+
+    // Translation
+    in-out property <string> translate-lang: "off";
+    in-out property <string> translate-lang-name;
+    in-out property <bool> translating;
+    in-out property <int> tr-progress;
+    in-out property <int> tr-total;
+    in-out property <string> tr-error;
+    in-out property <bool> tr-active;
+
+    // OpenSubtitles search
+    in-out property <string> search-query;
+    in-out property <string> search-lang;
+    in-out property <string> search-lang-name: "All";
+    in-out property <[SubSearchRow]> search-results;
+    in-out property <bool> searching;
+    in-out property <int> downloading-index: -1;
+    in-out property <bool> has-searched;
+    in-out property <string> search-error;
+
+    // --- Settings ---
+    in-out property <string> settings-tab: "general";
+    in-out property <string> settings-dialog;
+    in-out property <string> rebinding-action;
+    in-out property <string> ui-language: "en";
+    in-out property <string> ui-language-name: "English";
+    in-out property <string> pref-audio-name: "Auto";
+    in-out property <string> pref-sub-name: "Auto";
+    in-out property <string> sub-encoding-name: "Auto";
+    in-out property <float> def-volume: 100;
+    in-out property <float> def-speed: 1.0;
+    in-out property <string> pref-audio-lang;
+    in-out property <string> pref-sub-lang;
+    in-out property <bool> remember-position: true;
+    in-out property <bool> auto-play: true;
+    in-out property <bool> remember-selections: true;
+    in-out property <int> brightness;
+    in-out property <int> contrast;
+    in-out property <int> saturation;
+    in-out property <float> vid-zoom;
+    in-out property <bool> deinterlace;
+    in-out property <bool> volume-boost;
+    in-out property <bool> normalization;
+    in-out property <bool> eq-enabled;
+    in-out property <[int]> eq-bands: [0, 0, 0, 0, 0];
+    in-out property <string> sub-encoding;
+    in-out property <bool> apply-embedded-styles: true;
+    in-out property <[ShortcutRow]> shortcuts;
+    in-out property <string> app-version: "0.1.0";
+    in-out property <int> update-status;
+    in-out property <string> update-detail;
+}
+
+// Shared, read-only reference data + helpers used by more than one surface, so
+// the speed list / font list / time formatter are defined once instead of being
+// duplicated across the window and the extracted panels.
+export global Catalog {
+    out property <[float]> speeds: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 4.0];
+    out property <[string]> sub-fonts: ["Segoe UI", "Arial", "Tahoma", "Verdana", "Trebuchet MS", "Calibri", "Consolas", "Impact", "Georgia"];
+
+    pure function pad(n: float) -> string { n < 10 ? "0\{n}" : "\{n}" }
+    public pure function fmt-time(s: float) -> string {
+        s <= 0 ? "0:00"
+        : (floor(s / 3600) > 0
+            ? "\{floor(s / 3600)}:\{Catalog.pad(floor(mod(s, 3600) / 60))}:\{Catalog.pad(floor(mod(s, 60)))}"
+            : "\{floor(s / 60)}:\{Catalog.pad(floor(mod(s, 60)))}")
+    }
+}

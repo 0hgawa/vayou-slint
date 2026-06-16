@@ -1,0 +1,445 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru\n"
+
+msgid "Open File"
+msgstr "Открыть файл"
+
+msgid "Open URL"
+msgstr "Открыть URL"
+
+msgid "Pause"
+msgstr "Пауза"
+
+msgid "Play"
+msgstr "Воспроизвести"
+
+msgid "Stop"
+msgstr "Стоп"
+
+msgid "Subtitles"
+msgstr "Субтитры"
+
+msgid "Audio"
+msgstr "Аудио"
+
+msgid "Speed"
+msgstr "Скорость"
+
+msgid "Chapters"
+msgstr "Главы"
+
+msgid "Aspect Ratio"
+msgstr "Соотношение сторон"
+
+msgid "A-B Loop"
+msgstr "Петля A-B"
+
+msgid "Set A"
+msgstr "Установить A"
+
+msgid "Set B"
+msgstr "Установить B"
+
+msgid "Screenshot"
+msgstr "Снимок экрана"
+
+msgid "Screenshot saved"
+msgstr "Снимок экрана сохранён"
+
+msgid "Media Info"
+msgstr "Сведения о медиа"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Always on Top"
+msgstr "Поверх всех окон"
+
+msgid "Sleep Timer"
+msgstr "Таймер сна"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Off"
+msgstr "Выкл"
+
+msgid "Auto"
+msgstr "Авто"
+
+msgid "No subtitle tracks"
+msgstr "Нет дорожек субтитров"
+
+msgid "No audio tracks"
+msgstr "Нет аудиодорожек"
+
+msgid "Disable"
+msgstr "Отключить"
+
+msgid "Open local subtitle"
+msgstr "Открыть локальный субтитр"
+
+msgid "ON"
+msgstr "Вкл"
+
+msgid "Delay"
+msgstr "Задержка"
+
+msgid "Translate"
+msgstr "Перевести"
+
+msgid "Style"
+msgstr "Стиль"
+
+msgid "Reset"
+msgstr "Сброс"
+
+msgid "Font"
+msgstr "Шрифт"
+
+msgid "Size"
+msgstr "Размер"
+
+msgid "Text Color"
+msgstr "Цвет текста"
+
+msgid "Border Color"
+msgstr "Цвет обводки"
+
+msgid "Border Size"
+msgstr "Толщина обводки"
+
+msgid "Position"
+msgstr "Положение"
+
+msgid "Text"
+msgstr "Текст"
+
+msgid "Bold"
+msgstr "??????"
+
+msgid "Border"
+msgstr "Обводка"
+
+msgid "Playlist"
+msgstr "Плейлист"
+
+msgid "Empty playlist"
+msgstr "Плейлист пуст"
+
+msgid "+ Files"
+msgstr "+ Файлы"
+
+msgid "+ Folder"
+msgstr "+ Папка"
+
+msgid "Clear"
+msgstr "Очистить"
+
+msgid "Remove"
+msgstr "Удалить"
+
+msgid "Shuffle"
+msgstr "Перемешать"
+
+msgid "Repeat"
+msgstr "Повтор"
+
+msgid "items"
+msgstr "элементов"
+
+msgid "Search online..."
+msgstr "Поиск в интернете..."
+
+msgid "Search Online"
+msgstr "Поиск в интернете"
+
+msgid "Search subtitle"
+msgstr "Поиск субтитров"
+
+msgid "Searching..."
+msgstr "Поиск..."
+
+msgid "No results"
+msgstr "Нет результатов"
+
+msgid "Download failed"
+msgstr "Ошибка загрузки"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "Resolution"
+msgstr "Разрешение"
+
+msgid "Video Codec"
+msgstr "Видеокодек"
+
+msgid "Audio Codec"
+msgstr "Аудиокодек"
+
+msgid "FPS"
+msgstr "FPS"
+
+msgid "Video Bitrate"
+msgstr "Битрейт видео"
+
+msgid "Audio Bitrate"
+msgstr "Битрейт аудио"
+
+msgid "Duration"
+msgstr "Длительность"
+
+msgid "File Size"
+msgstr "Размер файла"
+
+msgid "General"
+msgstr "Основные"
+
+msgid "Video"
+msgstr "Видео"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Preferred Audio Language"
+msgstr "Предпочитаемый звук"
+
+msgid "Preferred Subtitle Language"
+msgstr "Предпочитаемые субтитры"
+
+msgid "Deinterlace"
+msgstr "Деинтерлейсинг"
+
+msgid "Default Volume"
+msgstr "Громкость по умолчанию"
+
+msgid "Default Speed"
+msgstr "Скорость по умолчанию"
+
+msgid "Remember Position"
+msgstr "Запоминать позицию"
+
+msgid "Auto Play"
+msgstr "Автовоспроизведение"
+
+msgid "Remember Audio/Subtitle"
+msgstr "Запоминать аудио/субтитры"
+
+msgid "Subtitle Encoding"
+msgstr "Кодировка субтитров"
+
+msgid "Color"
+msgstr "Цвет"
+
+msgid "Brightness"
+msgstr "Яркость"
+
+msgid "Contrast"
+msgstr "Контрастность"
+
+msgid "Saturation"
+msgstr "Насыщенность"
+
+msgid "Zoom"
+msgstr "Масштаб"
+
+msgid "Normalization"
+msgstr "Нормализация"
+
+msgid "Volume Boost"
+msgstr "Усиление громкости"
+
+msgid "Equalizer"
+msgstr "Эквалайзер"
+
+msgid "Apply Embedded Styles"
+msgstr "Применять встроенные стили"
+
+msgid "Restore Defaults"
+msgstr "Сбросить настройки"
+
+msgid "Previous"
+msgstr "Предыдущий"
+
+msgid "Next"
+msgstr "Следующий"
+
+msgid "Fullscreen"
+msgstr "Полный экран"
+
+msgid "Playback speed"
+msgstr "Скорость воспроизведения"
+
+msgid "Menu"
+msgstr "Меню"
+
+msgid "Minimize"
+msgstr "Свернуть"
+
+msgid "Maximize"
+msgstr "Развернуть"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Play / Pause"
+msgstr "Воспроизведение / Пауза"
+
+msgid "Seek Forward (5s)"
+msgstr "Перемотка вперёд (5с)"
+
+msgid "Seek Forward (30s)"
+msgstr "Перемотка вперёд (30с)"
+
+msgid "Seek Back (5s)"
+msgstr "Перемотка назад (5с)"
+
+msgid "Seek Back (30s)"
+msgstr "Перемотка назад (30с)"
+
+msgid "Frame Step"
+msgstr "Следующий кадр"
+
+msgid "Frame Back"
+msgstr "Предыдущий кадр"
+
+msgid "Speed Up"
+msgstr "Увеличить скорость"
+
+msgid "Speed Down"
+msgstr "Уменьшить скорость"
+
+msgid "Volume Up"
+msgstr "Увеличить громкость"
+
+msgid "Volume Down"
+msgstr "Уменьшить громкость"
+
+msgid "Mute"
+msgstr "Без звука"
+
+msgid "Cycle Subtitles"
+msgstr "Переключить субтитры"
+
+msgid "Cycle Audio"
+msgstr "Переключить аудиодорожку"
+
+msgid "Shortcuts"
+msgstr "Горячие клавиши"
+
+msgid "Playback"
+msgstr "Воспроизведение"
+
+msgid "Volume"
+msgstr "Громкость"
+
+msgid "Tracks"
+msgstr "Дорожки"
+
+msgid "Navigation"
+msgstr "Навигация"
+
+msgid "Reset All Shortcuts"
+msgstr "Сбросить все горячие клавиши"
+
+msgid "Press a key..."
+msgstr "Нажмите клавишу..."
+
+msgid "Drop file to play"
+msgstr "Перетащите файл для воспроизведения"
+
+msgid "Vayou"
+msgstr "Vayou"
+
+msgid "Drop a file here or press"
+msgstr "Перетащите файл сюда или нажмите"
+
+msgid "to open"
+msgstr "чтобы открыть"
+
+msgid "OK"
+msgstr "ХОРОШО"
+
+msgid "About"
+msgstr "О"
+
+msgid "Interface"
+msgstr "Интерфейс"
+
+msgid "Output"
+msgstr "Выход"
+
+msgid "Flat"
+msgstr "Плоский"
+
+msgid "Bass"
+msgstr "Бас"
+
+msgid "Treble"
+msgstr "Высокие частоты"
+
+msgid "Vocal"
+msgstr "Вокал"
+
+msgid "Rock"
+msgstr "Камень"
+
+msgid "Native video player"
+msgstr "Родной видеоплеер"
+
+msgid "Updates"
+msgstr "Обновления"
+
+msgid "Application updates"
+msgstr "Обновления приложения"
+
+msgid "Checking…"
+msgstr "Проверка…"
+
+msgid "You're on the latest version."
+msgstr "У вас последняя версия."
+
+msgid "Downloading and verifying…"
+msgstr "Загрузка и проверка…"
+
+msgid "Update installed — restart to apply."
+msgstr "Обновление установлено — перезапустите, чтобы применить."
+
+msgid "Check whether a newer version is available."
+msgstr "Проверьте, доступна ли более новая версия."
+
+msgid "Open releases page"
+msgstr "Открыть страницу релизов"
+
+msgid "Restart now"
+msgstr "Перезагрузить сейчас"
+
+msgid "Install"
+msgstr "Установить"
+
+msgid "Installing…"
+msgstr "Установка…"
+
+msgid "Check for updates"
+msgstr "Проверьте наличие обновлений"
+
+msgid "Restore defaults"
+msgstr "Восстановить настройки по умолчанию"
+
+msgid "Reset every setting to its default value."
+msgstr "Сбросьте все настройки до значений по умолчанию."
+
+msgid "Done"
+msgstr "Сделанный"
+
+msgid "{} min"
+msgstr "{} мин."
+
+msgid "Version {} is available."
+msgstr "Доступна версия {}."
+
+msgid "Couldn't update: {}"
+msgstr "Не удалось обновить: {}"

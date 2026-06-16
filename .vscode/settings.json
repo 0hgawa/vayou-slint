@@ -1,0 +1,15 @@
+{
+  // Slint live preview: edit ui/*.slint and see layout/colors/animations
+  // update instantly, with no Rust rebuild. Use the "Show Preview" lens above
+  // any component, or open the Slint preview panel.
+  "slint.preview.hide_ui": false,
+
+  // Check-on-save uses clippy so it matches the pedantic/nursery gate in
+  // Cargo.toml instead of surfacing warnings only at build time.
+  "rust-analyzer.check.command": "clippy",
+
+  // Give rust-analyzer its own target dir so its background `cargo check`
+  // never holds the build lock that `cargo run` / `cargo watch` needs — the
+  // editor and a manual run stop blocking each other.
+  "rust-analyzer.cargo.targetDir": true
+}

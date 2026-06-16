@@ -1,0 +1,445 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: hi\n"
+
+msgid "Open File"
+msgstr "फ़ाइल खोलें"
+
+msgid "Open URL"
+msgstr "URL खोलें"
+
+msgid "Pause"
+msgstr "रोकें"
+
+msgid "Play"
+msgstr "चलाएँ"
+
+msgid "Stop"
+msgstr "बंद करें"
+
+msgid "Subtitles"
+msgstr "उपशीर्षक"
+
+msgid "Audio"
+msgstr "ऑडियो"
+
+msgid "Speed"
+msgstr "गति"
+
+msgid "Chapters"
+msgstr "अध्याय"
+
+msgid "Aspect Ratio"
+msgstr "पक्षानुपात"
+
+msgid "A-B Loop"
+msgstr "A-B Loop"
+
+msgid "Set A"
+msgstr "A सेट करें"
+
+msgid "Set B"
+msgstr "B सेट करें"
+
+msgid "Screenshot"
+msgstr "स्क्रीनशॉट"
+
+msgid "Screenshot saved"
+msgstr "स्क्रीनशॉट सहेजा गया"
+
+msgid "Media Info"
+msgstr "मीडिया जानकारी"
+
+msgid "Settings"
+msgstr "सेटिंग्स"
+
+msgid "Always on Top"
+msgstr "हमेशा ऊपर"
+
+msgid "Sleep Timer"
+msgstr "स्लीप टाइमर"
+
+msgid "Cancel"
+msgstr "रद्द करें"
+
+msgid "Off"
+msgstr "बंद"
+
+msgid "Auto"
+msgstr "स्वचालित"
+
+msgid "No subtitle tracks"
+msgstr "कोई उपशीर्षक ट्रैक नहीं"
+
+msgid "No audio tracks"
+msgstr "कोई ऑडियो ट्रैक नहीं"
+
+msgid "Disable"
+msgstr "अक्षम करें"
+
+msgid "Open local subtitle"
+msgstr "स्थानीय सबटाइटल खोलें"
+
+msgid "ON"
+msgstr "चालू"
+
+msgid "Delay"
+msgstr "विलंब"
+
+msgid "Translate"
+msgstr "अनुवाद"
+
+msgid "Style"
+msgstr "शैली"
+
+msgid "Reset"
+msgstr "रीसेट"
+
+msgid "Font"
+msgstr "फ़ॉन्ट"
+
+msgid "Size"
+msgstr "आकार"
+
+msgid "Text Color"
+msgstr "टेक्स्ट रंग"
+
+msgid "Border Color"
+msgstr "बॉर्डर रंग"
+
+msgid "Border Size"
+msgstr "बॉर्डर आकार"
+
+msgid "Position"
+msgstr "स्थिति"
+
+msgid "Text"
+msgstr "टेक्स्ट"
+
+msgid "Bold"
+msgstr "????"
+
+msgid "Border"
+msgstr "बॉर्डर"
+
+msgid "Playlist"
+msgstr "प्लेलिस्ट"
+
+msgid "Empty playlist"
+msgstr "खाली प्लेलिस्ट"
+
+msgid "+ Files"
+msgstr "+ फ़ाइलें"
+
+msgid "+ Folder"
+msgstr "+ फ़ोल्डर"
+
+msgid "Clear"
+msgstr "साफ़ करें"
+
+msgid "Remove"
+msgstr "हटाएँ"
+
+msgid "Shuffle"
+msgstr "शफ़ल"
+
+msgid "Repeat"
+msgstr "दोहराएँ"
+
+msgid "items"
+msgstr "आइटम"
+
+msgid "Search online..."
+msgstr "ऑनलाइन खोजें..."
+
+msgid "Search Online"
+msgstr "ऑनलाइन खोजें"
+
+msgid "Search subtitle"
+msgstr "सबटाइटल खोजें"
+
+msgid "Searching..."
+msgstr "खोज रहे हैं..."
+
+msgid "No results"
+msgstr "कोई परिणाम नहीं"
+
+msgid "Download failed"
+msgstr "डाउनलोड विफल"
+
+msgid "File"
+msgstr "फ़ाइल"
+
+msgid "Resolution"
+msgstr "रिज़ॉल्यूशन"
+
+msgid "Video Codec"
+msgstr "वीडियो कोडेक"
+
+msgid "Audio Codec"
+msgstr "ऑडियो कोडेक"
+
+msgid "FPS"
+msgstr "FPS"
+
+msgid "Video Bitrate"
+msgstr "वीडियो बिटरेट"
+
+msgid "Audio Bitrate"
+msgstr "ऑडियो बिटरेट"
+
+msgid "Duration"
+msgstr "अवधि"
+
+msgid "File Size"
+msgstr "फ़ाइल आकार"
+
+msgid "General"
+msgstr "सामान्य"
+
+msgid "Video"
+msgstr "वीडियो"
+
+msgid "Language"
+msgstr "भाषा"
+
+msgid "Preferred Audio Language"
+msgstr "पसंदीदा ऑडियो"
+
+msgid "Preferred Subtitle Language"
+msgstr "पसंदीदा सबटाइटल"
+
+msgid "Deinterlace"
+msgstr "डीइंटरलेस"
+
+msgid "Default Volume"
+msgstr "डिफ़ॉल्ट वॉल्यूम"
+
+msgid "Default Speed"
+msgstr "डिफ़ॉल्ट गति"
+
+msgid "Remember Position"
+msgstr "स्थिति याद रखें"
+
+msgid "Auto Play"
+msgstr "स्वचालित चलाएँ"
+
+msgid "Remember Audio/Subtitle"
+msgstr "ऑडियो/सबटाइटल याद रखें"
+
+msgid "Subtitle Encoding"
+msgstr "सबटाइटल एन्कोडिंग"
+
+msgid "Color"
+msgstr "रंग"
+
+msgid "Brightness"
+msgstr "चमक"
+
+msgid "Contrast"
+msgstr "कंट्रास्ट"
+
+msgid "Saturation"
+msgstr "संतृप्ति"
+
+msgid "Zoom"
+msgstr "ज़ूम"
+
+msgid "Normalization"
+msgstr "सामान्यीकरण"
+
+msgid "Volume Boost"
+msgstr "वॉल्यूम बूस्ट"
+
+msgid "Equalizer"
+msgstr "इक्वलाइज़र"
+
+msgid "Apply Embedded Styles"
+msgstr "एम्बेडेड स्टाइल लागू करें"
+
+msgid "Restore Defaults"
+msgstr "डिफ़ॉल्ट पुनर्स्थापित करें"
+
+msgid "Previous"
+msgstr "पिछला"
+
+msgid "Next"
+msgstr "अगला"
+
+msgid "Fullscreen"
+msgstr "पूर्ण स्क्रीन"
+
+msgid "Playback speed"
+msgstr "प्लेबैक गति"
+
+msgid "Menu"
+msgstr "मेनू"
+
+msgid "Minimize"
+msgstr "छोटा करें"
+
+msgid "Maximize"
+msgstr "बड़ा करें"
+
+msgid "Close"
+msgstr "बंद करें"
+
+msgid "Play / Pause"
+msgstr "चलाएँ / रोकें"
+
+msgid "Seek Forward (5s)"
+msgstr "आगे जाएँ (5 सेकंड)"
+
+msgid "Seek Forward (30s)"
+msgstr "आगे जाएँ (30 सेकंड)"
+
+msgid "Seek Back (5s)"
+msgstr "पीछे जाएँ (5 सेकंड)"
+
+msgid "Seek Back (30s)"
+msgstr "पीछे जाएँ (30 सेकंड)"
+
+msgid "Frame Step"
+msgstr "अगला फ़्रेम"
+
+msgid "Frame Back"
+msgstr "पिछला फ़्रेम"
+
+msgid "Speed Up"
+msgstr "गति बढ़ाएँ"
+
+msgid "Speed Down"
+msgstr "गति घटाएँ"
+
+msgid "Volume Up"
+msgstr "आवाज़ बढ़ाएँ"
+
+msgid "Volume Down"
+msgstr "आवाज़ घटाएँ"
+
+msgid "Mute"
+msgstr "म्यूट"
+
+msgid "Cycle Subtitles"
+msgstr "उपशीर्षक बदलें"
+
+msgid "Cycle Audio"
+msgstr "ऑडियो बदलें"
+
+msgid "Shortcuts"
+msgstr "शॉर्टकट"
+
+msgid "Playback"
+msgstr "प्लेबैक"
+
+msgid "Volume"
+msgstr "आवाज़"
+
+msgid "Tracks"
+msgstr "ट्रैक"
+
+msgid "Navigation"
+msgstr "नेविगेशन"
+
+msgid "Reset All Shortcuts"
+msgstr "सभी शॉर्टकट रीसेट करें"
+
+msgid "Press a key..."
+msgstr "एक कुंजी दबाएँ..."
+
+msgid "Drop file to play"
+msgstr "चलाने के लिए फ़ाइल यहाँ छोड़ें"
+
+msgid "Vayou"
+msgstr "Vayou"
+
+msgid "Drop a file here or press"
+msgstr "यहाँ फ़ाइल छोड़ें या दबाएँ"
+
+msgid "to open"
+msgstr "खोलने के लिए"
+
+msgid "OK"
+msgstr "ठीक है"
+
+msgid "About"
+msgstr "के बारे में"
+
+msgid "Interface"
+msgstr "इंटरफ़ेस"
+
+msgid "Output"
+msgstr "उत्पादन"
+
+msgid "Flat"
+msgstr "समतल"
+
+msgid "Bass"
+msgstr "बास"
+
+msgid "Treble"
+msgstr "तिहरा"
+
+msgid "Vocal"
+msgstr "स्वर"
+
+msgid "Rock"
+msgstr "चट्टान"
+
+msgid "Native video player"
+msgstr "देशी वीडियो प्लेयर"
+
+msgid "Updates"
+msgstr "अपडेट"
+
+msgid "Application updates"
+msgstr "एप्लिकेशन अपडेट"
+
+msgid "Checking…"
+msgstr "जाँच हो रही है..."
+
+msgid "You're on the latest version."
+msgstr "आप नवीनतम संस्करण पर हैं."
+
+msgid "Downloading and verifying…"
+msgstr "डाउनलोड और सत्यापन किया जा रहा है..."
+
+msgid "Update installed — restart to apply."
+msgstr "अद्यतन स्थापित - लागू करने के लिए पुनरारंभ करें।"
+
+msgid "Check whether a newer version is available."
+msgstr "जांचें कि क्या कोई नया संस्करण उपलब्ध है।"
+
+msgid "Open releases page"
+msgstr "रिलीज़ पृष्ठ खोलें"
+
+msgid "Restart now"
+msgstr "अब पुनःचालू करें"
+
+msgid "Install"
+msgstr "स्थापित करना"
+
+msgid "Installing…"
+msgstr "इंस्टाल किया जा रहा है..."
+
+msgid "Check for updates"
+msgstr "अद्यतन के लिए जाँच"
+
+msgid "Restore defaults"
+msgstr "डिफॉल्ट्स का पुनःस्थापन"
+
+msgid "Reset every setting to its default value."
+msgstr "प्रत्येक सेटिंग को उसके डिफ़ॉल्ट मान पर रीसेट करें।"
+
+msgid "Done"
+msgstr "हो गया"
+
+msgid "{} min"
+msgstr "{} मि"
+
+msgid "Version {} is available."
+msgstr "संस्करण {} उपलब्ध है."
+
+msgid "Couldn't update: {}"
+msgstr "अपडेट नहीं किया जा सका: {}"

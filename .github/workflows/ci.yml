@@ -1,0 +1,32 @@
+name: CI
+
+# Build, lint and test on every push and PR. libmpv/ffmpeg are loaded
+# dynamically at runtime, so neither is needed to compile or to run the unit
+# tests (the tests cover pure logic only — no mpv instance is created).
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cache cargo registry + build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Clippy (pedantic + nursery, warnings denied)
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Tests
+        run: cargo test --all-targets

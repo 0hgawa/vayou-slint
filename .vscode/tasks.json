@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Ctrl+Shift+B → save any .rs and the app rebuilds and relaunches itself.
+      // No more manual stop/build/run between iterations.
+      "label": "dev: watch & run",
+      "type": "shell",
+      "command": "cargo watch --clear -x run",
+      "isBackground": true,
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": "$rustc",
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    }
+  ]
+}

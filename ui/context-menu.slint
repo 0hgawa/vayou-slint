@@ -1,0 +1,106 @@
+import { Ic } from "icons.slint";
+import { MenuItem, MenuSep, MenuSurface } from "widgets.slint";
+import { PlayerState, RatioRow, Catalog } from "state.slint";
+
+// The right-click / hamburger context menu. Reads/writes shared state through
+// PlayerState; the actions it triggers are declared as callbacks here and
+// forwarded to the window's handlers at the instantiation site.
+export component ContextMenu inherits Rectangle {
+    callback open-file();
+    callback open-url();
+    callback ab-toggle();
+    callback screenshot();
+    callback open-info();
+    callback set-always-on-top(bool);
+    callback select-sub(int);
+    callback select-audio(int);
+    callback pick-speed(float);
+    callback seek-chapter(int);
+    callback set-aspect(string);
+    callback set-sleep(int);
+    callback cancel-sleep();
+
+    property <[RatioRow]> ratios: [
+        { value: "-1", label: "Auto" }, { value: "16:9", label: "16:9" }, { value: "4:3", label: "4:3" },
+        { value: "21:9", label: "21:9" }, { value: "16:10", label: "16:10" }, { value: "5:4", label: "5:4" },
+        { value: "1:1", label: "1:1" }, { value: "2.35:1", label: "2.35:1" }, { value: "2.39:1", label: "2.39:1" },
+    ];
+    property <[int]> sleep-options: [5, 10, 15, 20, 30, 45, 60, 90];
+
+    // Backdrop: a click anywhere off the card dismisses.
+    TouchArea {
+        clicked => { PlayerState.ctx-show = false; }
+        pointer-event(e) => { if (e.kind == PointerEventKind.down && e.button == PointerEventButton.right) { PlayerState.ctx-show = false; } }
+    }
+    card := MenuSurface {
+        width: 224px;
+        height: menucol.preferred-height;
+        x: clamp(PlayerState.ctx-x, 8px, root.width - self.width - 8px);
+        y: (PlayerState.ctx-y + self.height > root.height - 8px) ? max(8px, PlayerState.ctx-y - self.height) : min(PlayerState.ctx-y, root.height - self.height - 8px);
+        menucol := VerticalLayout {
+            padding-top: 6px; padding-bottom: 6px;
+            if PlayerState.ctx-page == "main": VerticalLayout {
+                MenuItem { icon: Ic.folder-open; label: @tr("Open File"); key-hint: "Ctrl+O"; clicked => { root.open-file(); PlayerState.ctx-show = false; } }
+                MenuItem { icon: Ic.link; label: @tr("Open URL"); key-hint: "Ctrl+U"; clicked => { root.open-url(); PlayerState.ctx-show = false; } }
+                MenuSep {}
+                if PlayerState.ctx-sub-tracks.length > 0: MenuItem { icon: Ic.subtitles; label: @tr("Subtitles"); arrow: true; clicked => { PlayerState.ctx-page = "sub"; } }
+                if PlayerState.ctx-audio-tracks.length > 0: MenuItem { icon: Ic.audio; label: @tr("Audio"); arrow: true; clicked => { PlayerState.ctx-page = "audio"; } }
+                MenuItem { icon: Ic.speed; label: @tr("Speed") + " (\{PlayerState.speed}x)"; arrow: true; clicked => { PlayerState.ctx-page = "speed"; } }
+                if PlayerState.chapters.length > 0: MenuItem { icon: Ic.segment; label: @tr("Chapters"); arrow: true; clicked => { PlayerState.ctx-page = "chapters"; } }
+                MenuItem { icon: Ic.aspect; label: @tr("Aspect Ratio"); arrow: true; clicked => { PlayerState.ctx-page = "aspect"; } }
+                MenuSep {}
+                MenuItem {
+                    icon: Ic.repeat; label: @tr("A-B Loop"); key-hint: "L"; active: PlayerState.ab-enabled;
+                    value-hint: !PlayerState.ab-enabled ? "" : (PlayerState.ab-a < 0 ? "On" : (PlayerState.ab-b < 0 ? "A" : "A • B"));
+                    clicked => { root.ab-toggle(); PlayerState.ctx-show = false; }
+                }
+                MenuItem { icon: Ic.camera; label: @tr("Screenshot"); key-hint: "S"; clicked => { root.screenshot(); PlayerState.ctx-show = false; } }
+                MenuItem { icon: Ic.info; label: @tr("Media Info"); key-hint: "I"; clicked => { root.open-info(); PlayerState.ctx-show = false; } }
+                MenuSep {}
+                MenuItem {
+                    icon: Ic.timer; label: @tr("Sleep Timer"); active: PlayerState.sleep-remaining != "";
+                    value-hint: PlayerState.sleep-remaining; arrow: PlayerState.sleep-remaining == "";
+                    clicked => { PlayerState.ctx-page = "sleep"; }
+                }
+                MenuItem { icon: Ic.pin; label: @tr("Always on Top"); active: PlayerState.pinned; clicked => { root.set-always-on-top(!PlayerState.pinned); PlayerState.ctx-show = false; } }
+                MenuItem { icon: Ic.settings; label: @tr("Settings"); clicked => { PlayerState.active-panel = "settings"; PlayerState.ctx-show = false; } }
+            }
+            if PlayerState.ctx-page == "sub": VerticalLayout {
+                MenuItem { label: "←  " + @tr("Subtitles"); clicked => { PlayerState.ctx-page = "main"; } }
+                MenuSep {}
+                MenuItem { show-check: true; checked: false; label: @tr("Off"); clicked => { root.select-sub(-1); PlayerState.ctx-show = false; } }
+                for t in PlayerState.ctx-sub-tracks: MenuItem { show-check: true; checked: t.selected; active: t.selected; label: t.label; clicked => { root.select-sub(t.id); PlayerState.ctx-show = false; } }
+            }
+            if PlayerState.ctx-page == "audio": VerticalLayout {
+                MenuItem { label: "←  " + @tr("Audio"); clicked => { PlayerState.ctx-page = "main"; } }
+                MenuSep {}
+                for t in PlayerState.ctx-audio-tracks: MenuItem { show-check: true; checked: t.selected; active: t.selected; label: t.label; clicked => { root.select-audio(t.id); PlayerState.ctx-show = false; } }
+            }
+            if PlayerState.ctx-page == "speed": VerticalLayout {
+                MenuItem { label: "←  " + @tr("Speed"); clicked => { PlayerState.ctx-page = "main"; } }
+                MenuSep {}
+                for s in Catalog.speeds: MenuItem { show-check: true; checked: PlayerState.speed == s; active: PlayerState.speed == s; label: "\{s}x"; clicked => { root.pick-speed(s); PlayerState.ctx-show = false; } }
+            }
+            if PlayerState.ctx-page == "chapters": VerticalLayout {
+                MenuItem { label: "←  " + @tr("Chapters"); clicked => { PlayerState.ctx-page = "main"; } }
+                MenuSep {}
+                for ch[i] in PlayerState.chapters: MenuItem {
+                    show-check: true; checked: ch.current;
+                    label: ch.title; key-hint: Catalog.fmt-time(ch.time); active: ch.current;
+                    clicked => { root.seek-chapter(i); PlayerState.ctx-show = false; }
+                }
+            }
+            if PlayerState.ctx-page == "aspect": VerticalLayout {
+                MenuItem { label: "←  " + @tr("Aspect Ratio"); clicked => { PlayerState.ctx-page = "main"; } }
+                MenuSep {}
+                for r in root.ratios: MenuItem { show-check: true; checked: r.value == PlayerState.current-aspect; active: r.value == PlayerState.current-aspect; label: r.value == "-1" ? @tr("Auto") : r.label; clicked => { root.set-aspect(r.value); PlayerState.ctx-show = false; } }
+            }
+            if PlayerState.ctx-page == "sleep": VerticalLayout {
+                MenuItem { label: "←  " + @tr("Sleep Timer"); clicked => { PlayerState.ctx-page = "main"; } }
+                MenuSep {}
+                if PlayerState.sleep-remaining != "": MenuItem { icon: Ic.close-x; label: @tr("Cancel"); value-hint: PlayerState.sleep-remaining; clicked => { root.cancel-sleep(); PlayerState.ctx-show = false; } }
+                for m in root.sleep-options: MenuItem { show-check: true; checked: PlayerState.sleep-min == m; active: PlayerState.sleep-min == m; label: @tr("{} min", m); clicked => { root.set-sleep(m); PlayerState.ctx-show = false; } }
+            }
+        }
+    }
+}

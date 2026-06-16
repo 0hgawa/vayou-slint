@@ -1,0 +1,44 @@
+// Dark M3 palette, mirrored from the WebView build's app.css (@theme block).
+// One source of truth for colours/shape/motion so components don't hardcode hex.
+export global Theme {
+    // Brand
+    out property <color> accent: #ffb300;
+    out property <color> on-accent: #1a1a1a;
+
+    // Surfaces (M3 hierarchy)
+    out property <color> surface-container-highest: #2e2e2e; // slider tracks
+
+    // Outlines
+    out property <color> outline: #8e8e8e;
+
+    // Floating surfaces (menus, dropdowns, pickers): a subtle tonal gradient
+    // (lighter at the top), a hairline border + a 1px highlight along the top
+    // edge, and a directional shadow — the macOS/Fluent "lifted glass" recipe.
+    // Slightly translucent (f7 ≈ 97%): enough life over video without hurting
+    // legibility, and free on small overlays (no fullscreen flip path to lose).
+    out property <color> menu-top: #1a1a1af7;
+    out property <color> menu-bottom: #121212f7;
+    out property <color> menu-border: #ffffff14;
+    out property <color> menu-highlight: #ffffff14;
+    out property <color> shadow: #000000b3;
+
+    // Hover states (shared by menu rows and buttons).
+    out property <color> hover: #ffffff1a;
+    out property <color> hover-strong: #ffffff2e;
+
+    // Spacing rhythm, mirrored from the WebView (Tailwind px-3 / py-2 / gap-3).
+    // One scale so menus, panels and rows share the same breathing room.
+    out property <length> pad: 16px;       // content inset for panels/menus/settings (the "drops")
+    out property <length> gap: 12px;       // icon ↔ label gap (gap-3)
+    out property <length> row-h: 36px;     // menu/list row height
+    out property <length> setting-h: 44px; // settings row height
+
+    // Shape
+    out property <length> radius-sm: 8px;
+    out property <length> radius-md: 12px;
+
+    // Motion
+    out property <duration> slow: 250ms;
+
+    out property <string> font: "Segoe UI";
+}

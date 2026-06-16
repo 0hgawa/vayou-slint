@@ -1,0 +1,103 @@
+[package]
+name = "vayou"
+version = "0.1.0"
+edition = "2021"
+description = "Vayou — native Windows video player (libmpv + Slint). Single window, frameless, GPU video."
+authors = ["Ohgawa"]
+license = "MIT"
+
+[dependencies]
+# The OpenGL underlay (mpv renders into the GL framebuffer under the UI) needs
+# the femtovg/OpenGL renderer + winit backend; that's what gives the
+# `GraphicsAPI::NativeOpenGL` context in the rendering notifier.
+slint = { version = "1", features = ["raw-window-handle-06", "backend-winit", "renderer-femtovg"] }
+raw-window-handle = "0.6"
+# libmpv loaded dynamically at runtime (binaries/libmpv-2.dll).
+libloading = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+dirs = "5"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+# Subtitle search + translation HTTP, and the signed self-update download.
+# rustls so there's no OpenSSL build dep; `stream` for chunked update download.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+# Verify the minisign signature of a downloaded update before swapping it in
+# (verify-only — no signing, keeps the binary lean).
+minisign-verify = "0.2"
+# Swap the running exe in place for the downloaded update (rename-self trick),
+# so a self-update fetches just vayou.exe, not the whole installer.
+self-replace = "1"
+urlencoding = "2"
+flate2 = "1"
+# Async runtime for translate fan-out, ffmpeg sidecar, and HTTP.
+tokio = { version = "1", features = ["rt-multi-thread", "time", "process", "io-util", "sync", "macros"] }
+# Native file/folder picker (Open File / playlist add).
+rfd = "0.15"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+windows = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Graphics_Dwm",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Registry",
+    "Win32_Security",
+    "Win32_UI_HiDpi",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Input_KeyboardAndMouse",
+] }
+
+[build-dependencies]
+slint-build = "1"
+embed-resource = "3"
+
+# Fast iteration — own code unoptimized (quick to compile), dependencies
+# optimized once (slint/femtovg/tokio stay smooth at runtime during dev).
+# Minimal debug info keeps the incremental link short.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+opt-level = 2
+
+# Lean release — same bar as the Tauri build and Clipo.
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+panic = "abort"
+codegen-units = 1
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+doc_markdown = "allow"
+cast_possible_truncation = "allow"
+cast_precision_loss = "allow"
+cast_sign_loss = "allow"
+cast_possible_wrap = "allow"
+too_many_lines = "allow"
+struct_excessive_bools = "allow"
+many_single_char_names = "allow"
+# Nursery/pedantic lints that are noise in this FFI- and math-heavy code, the
+# same allowances the native sibling project carries.
+option_if_let_else = "allow"
+significant_drop_in_scrutinee = "allow"
+significant_drop_tightening = "allow"
+type_complexity = "allow"
+items_after_statements = "allow"
+ptr_as_ptr = "allow"
+unnecessary_wraps = "allow"
+format_push_string = "allow"
+large_stack_arrays = "allow"
+needless_continue = "allow"
+assigning_clones = "allow"
+or_fun_call = "allow"
+# `pub(crate)` is the deliberate, clearer way to mark the crate-internal bridge
+# API in this binary; the nursery lint that flags it as redundant is noise here.
+redundant_pub_crate = "allow"

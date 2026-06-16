@@ -1,0 +1,408 @@
+import { ScrollView } from "std-widgets.slint";
+import { Theme } from "theme.slint";
+import { Ic, AppIcon } from "icons.slint";
+import { CtrlButton, HSlider, MenuItem, MenuSurface, Switch, SettingToggleRow, SettingNavRow, SettingSliderRow, TextButton, VScroll, RailItem } from "widgets.slint";
+import { PlayerState, NamedLang, Catalog } from "state.slint";
+
+// The settings modal (tabbed) plus the centred options-picker dialog it opens.
+// State lives in PlayerState; the actions are declared here and forwarded to the
+// window's handlers at the instantiation site. The component fills the window,
+// so `root.width/height` is the window size for centring the cards.
+export component SettingsPanel inherits Rectangle {
+    callback toggle-auto-play();
+    callback toggle-remember-position();
+    callback toggle-remember-selections();
+    callback reset-video();
+    callback set-brightness(int);
+    callback set-contrast(int);
+    callback set-saturation(int);
+    callback set-vid-zoom(float);
+    callback toggle-deinterlace();
+    callback set-def-volume(float);
+    callback toggle-volume-boost();
+    callback toggle-normalization();
+    callback toggle-eq();
+    callback set-eq-preset(string);
+    callback reset-eq();
+    callback set-eq(int, int);
+    callback reset-sub-style();
+    callback apply-sub-style();
+    callback pick-color(string);
+    callback toggle-embedded-styles();
+    callback reset-shortcuts();
+    callback open-release-page();
+    callback relaunch-app();
+    callback install-update();
+    callback check-updates();
+    callback restore-defaults();
+    callback set-ui-language(string);
+    callback set-def-speed(float);
+    callback set-pref-audio(string);
+    callback set-pref-sub(string);
+    callback set-sub-encoding(string);
+
+    property <[string]> eq-labels: ["60Hz", "230Hz", "910Hz", "3.6kHz", "14kHz"];
+    property <[string]> eq-presets: ["Flat", "Bass", "Treble", "Vocal", "Rock"];
+    // Active preset pill. Cleared to "" when a band is dragged manually (custom).
+    property <string> eq-preset: "Flat";
+    property <[NamedLang]> ui-languages: [
+        { code: "en", name: "English" }, { code: "pt", name: "Português" }, { code: "es", name: "Español" },
+        { code: "fr", name: "Français" }, { code: "de", name: "Deutsch" }, { code: "it", name: "Italiano" },
+        { code: "ja", name: "日本語" }, { code: "ko", name: "한국어" }, { code: "zh", name: "中文" },
+        { code: "ru", name: "Русский" }, { code: "ar", name: "العربية" }, { code: "hi", name: "हिन्दी" },
+    ];
+    property <[NamedLang]> track-langs: [
+        { code: "", name: "Auto" }, { code: "eng", name: "English" }, { code: "por", name: "Português" },
+        { code: "spa", name: "Español" }, { code: "fre", name: "Français" }, { code: "ger", name: "Deutsch" },
+        { code: "ita", name: "Italiano" }, { code: "jpn", name: "日本語" }, { code: "kor", name: "한국어" },
+        { code: "chi", name: "中文" }, { code: "rus", name: "Русский" }, { code: "ara", name: "العربية" }, { code: "hin", name: "हिन्दी" },
+    ];
+    property <[NamedLang]> sub-encodings: [
+        { code: "", name: "Auto" }, { code: "utf-8", name: "UTF-8" }, { code: "cp1252", name: "Western (Windows-1252)" },
+        { code: "iso-8859-1", name: "Western (ISO-8859-1)" }, { code: "cp1251", name: "Cyrillic (Windows-1251)" },
+        { code: "iso-8859-2", name: "Central European (ISO-8859-2)" }, { code: "gbk", name: "Chinese Simplified (GBK)" },
+        { code: "big5", name: "Chinese Traditional (Big5)" }, { code: "shift-jis", name: "Japanese (Shift-JIS)" }, { code: "euc-kr", name: "Korean (EUC-KR)" },
+    ];
+
+
+    // Shortcut labels are rendered here (not in Rust) so they re-localise live
+    // when the language changes. Keyed by the action id / category from Rust.
+    pure function action-label(id: string) -> string {
+        id == "togglePause" ? @tr("Play / Pause")
+        : id == "seekForward" ? @tr("Seek Forward (5s)")
+        : id == "seekForwardLong" ? @tr("Seek Forward (30s)")
+        : id == "seekBack" ? @tr("Seek Back (5s)")
+        : id == "seekBackLong" ? @tr("Seek Back (30s)")
+        : id == "nextFile" ? @tr("Next")
+        : id == "prevFile" ? @tr("Previous")
+        : id == "frameNext" ? @tr("Frame Step")
+        : id == "framePrev" ? @tr("Frame Back")
+        : id == "speedUp" ? @tr("Speed Up")
+        : id == "speedDown" ? @tr("Speed Down")
+        : id == "abLoop" ? @tr("A-B Loop")
+        : id == "volumeUp" ? @tr("Volume Up")
+        : id == "volumeDown" ? @tr("Volume Down")
+        : id == "mute" ? @tr("Mute")
+        : id == "fullscreen" ? @tr("Fullscreen")
+        : id == "screenshot" ? @tr("Screenshot")
+        : id == "aspectRatio" ? @tr("Aspect Ratio")
+        : id == "cycleSub" ? @tr("Cycle Subtitles")
+        : id == "cycleAudio" ? @tr("Cycle Audio")
+        : id == "openFile" ? @tr("Open File")
+        : id == "openUrl" ? @tr("Open URL")
+        : id == "mediaInfo" ? @tr("Media Info")
+        : ""
+    }
+    pure function category-label(cat: string) -> string {
+        cat == "volume" ? @tr("Volume")
+        : cat == "video" ? @tr("Video")
+        : cat == "tracks" ? @tr("Tracks")
+        : cat == "navigation" ? @tr("Navigation")
+        : @tr("Playback")
+    }
+
+    // Confirmation flash for the full-width "Reset All Shortcuts" button (the
+    // small Reset buttons get this from TextButton's confirm-on-click instead).
+    property <bool> sc-reset-done;
+    sc-reset-timer := Timer {
+        interval: 1500ms;
+        running: root.sc-reset-done;
+        triggered => { root.sc-reset-done = false; }
+    }
+
+    background: #00000066;
+    TouchArea { clicked => { PlayerState.active-panel = ""; } }
+    MenuSurface {
+        width: 620px;
+        // Hug the active tab's content, capped so it never gets too tall.
+        height: min(col.preferred-height, min(root.height - 56px, 560px));
+        x: (root.width - self.width) / 2;
+        y: (root.height - self.height) / 2;
+        TouchArea {} // swallow clicks so they don't reach the backdrop
+        col := VerticalLayout {
+            // Header
+            HorizontalLayout {
+                height: 48px; padding-left: 16px; padding-right: 8px;
+                Text { text: @tr("Settings"); color: #ffffffe6; font-size: 14px; font-weight: 600; vertical-alignment: center; horizontal-stretch: 1; }
+                VerticalLayout { alignment: center; CtrlButton { width: 28px; height: 28px; icon-size: 13px; icon: Ic.close-x; square-hover: true; clicked => { PlayerState.active-panel = ""; } } }
+            }
+            // Body: rail + detail
+            HorizontalLayout {
+                padding-right: 8px; padding-bottom: 10px;
+                VerticalLayout {
+                    width: 190px; padding: 8px; spacing: 2px;
+                    RailItem { icon: Ic.tune; label: @tr("General"); selected: PlayerState.settings-tab == "general"; clicked => { PlayerState.settings-tab = "general"; } }
+                    RailItem { icon: Ic.movie; label: @tr("Video"); selected: PlayerState.settings-tab == "video"; clicked => { PlayerState.settings-tab = "video"; } }
+                    RailItem { icon: Ic.graphic-eq; label: @tr("Audio"); selected: PlayerState.settings-tab == "audio"; clicked => { PlayerState.settings-tab = "audio"; } }
+                    RailItem { icon: Ic.subtitles; label: @tr("Subtitles"); selected: PlayerState.settings-tab == "subtitles"; clicked => { PlayerState.settings-tab = "subtitles"; } }
+                    RailItem { icon: Ic.keyboard; label: @tr("Shortcuts"); selected: PlayerState.settings-tab == "shortcuts"; clicked => { PlayerState.settings-tab = "shortcuts"; } }
+                    RailItem { icon: Ic.info; label: @tr("About"); selected: PlayerState.settings-tab == "about"; clicked => { PlayerState.settings-tab = "about"; } }
+                    Rectangle {}
+                }
+                VScroll {
+                    horizontal-stretch: 1;
+                    VerticalLayout {
+                        // Uniform top inset so every tab's content starts at the same
+                        // height as the left rail (which uses an 8px inset) — no
+                        // per-tab top padding on the first element below.
+                        padding-top: 8px; padding-right: 4px; padding-bottom: 10px;
+                        if PlayerState.settings-tab == "general": VerticalLayout {
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; height: 42px;
+                                Text { text: @tr("Interface"); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; vertical-alignment: center; }
+                            }
+                            SettingNavRow { icon: Ic.language; title: @tr("Language"); value: PlayerState.ui-language-name; clicked => { PlayerState.settings-dialog = "language"; } }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 24px; height: 42px;
+                                Text { text: @tr("Playback"); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; vertical-alignment: center; }
+                            }
+                            SettingNavRow { icon: Ic.speed; title: @tr("Default Speed"); value: "\{PlayerState.def-speed}x"; clicked => { PlayerState.settings-dialog = "speed"; } }
+                            SettingToggleRow { icon: Ic.play-circle; title: @tr("Auto Play"); on: PlayerState.auto-play; toggled => { PlayerState.auto-play = !PlayerState.auto-play; root.toggle-auto-play(); } }
+                            SettingToggleRow { icon: Ic.history; title: @tr("Remember Position"); on: PlayerState.remember-position; toggled => { PlayerState.remember-position = !PlayerState.remember-position; root.toggle-remember-position(); } }
+                            SettingToggleRow { icon: Ic.check; title: @tr("Remember Audio/Subtitle"); on: PlayerState.remember-selections; toggled => { PlayerState.remember-selections = !PlayerState.remember-selections; root.toggle-remember-selections(); } }
+                        }
+                        if PlayerState.settings-tab == "video": VerticalLayout {
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; height: 42px;
+                                Text { text: @tr("Color"); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; horizontal-stretch: 1; vertical-alignment: center; }
+                                VerticalLayout { alignment: center; TextButton { text: @tr("Reset"); confirm-on-click: true; clicked => { root.reset-video(); } } }
+                            }
+                            SettingSliderRow { icon: Ic.brightness; title: @tr("Brightness"); value: "\{PlayerState.brightness}"; svalue: PlayerState.brightness; minimum: -100; maximum: 100; bipolar: true; changed(v) => { PlayerState.brightness = round(v); root.set-brightness(PlayerState.brightness); } }
+                            SettingSliderRow { icon: Ic.contrast; title: @tr("Contrast"); value: "\{PlayerState.contrast}"; svalue: PlayerState.contrast; minimum: -100; maximum: 100; bipolar: true; changed(v) => { PlayerState.contrast = round(v); root.set-contrast(PlayerState.contrast); } }
+                            SettingSliderRow { icon: Ic.palette; title: @tr("Saturation"); value: "\{PlayerState.saturation}"; svalue: PlayerState.saturation; minimum: -100; maximum: 100; bipolar: true; changed(v) => { PlayerState.saturation = round(v); root.set-saturation(PlayerState.saturation); } }
+                            SettingSliderRow { icon: Ic.zoom-in; title: @tr("Zoom"); value: "\{round(PlayerState.vid-zoom * 10) / 10}"; svalue: PlayerState.vid-zoom; minimum: -1; maximum: 3; bipolar: true; changed(v) => { PlayerState.vid-zoom = round(v * 10) / 10; root.set-vid-zoom(PlayerState.vid-zoom); } }
+                            SettingToggleRow { icon: Ic.tune; title: @tr("Deinterlace"); on: PlayerState.deinterlace; toggled => { PlayerState.deinterlace = !PlayerState.deinterlace; root.toggle-deinterlace(); } }
+                        }
+                        if PlayerState.settings-tab == "audio": VerticalLayout {
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; height: 42px;
+                                Text { text: @tr("Output"); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; vertical-alignment: center; }
+                            }
+                            SettingSliderRow { icon: Ic.volume-on; title: @tr("Default Volume"); value: "\{round(PlayerState.def-volume)}%"; svalue: PlayerState.def-volume; minimum: 0; maximum: PlayerState.max-volume; changed(v) => { PlayerState.def-volume = round(v); root.set-def-volume(PlayerState.def-volume); } }
+                            SettingNavRow { icon: Ic.audio; title: @tr("Preferred Audio Language"); value: PlayerState.pref-audio-lang == "" ? @tr("Auto") : PlayerState.pref-audio-name; clicked => { PlayerState.settings-dialog = "audioLang"; } }
+                            SettingToggleRow { icon: Ic.volume-on; title: @tr("Volume Boost"); on: PlayerState.volume-boost; toggled => { PlayerState.volume-boost = !PlayerState.volume-boost; root.toggle-volume-boost(); } }
+                            SettingToggleRow { icon: Ic.graphic-eq; title: @tr("Normalization"); on: PlayerState.normalization; toggled => { PlayerState.normalization = !PlayerState.normalization; root.toggle-normalization(); } }
+                            // Equalizer — accent section header with an inline master toggle
+                            // (consistent with "Output" above). The presets + bands reveal
+                            // only when it's on, so the tab stays clean while disabled.
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 24px; height: 42px; spacing: 12px;
+                                Text { text: @tr("Equalizer"); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; vertical-alignment: center; horizontal-stretch: 1; }
+                                VerticalLayout { alignment: center; Switch { on: PlayerState.eq-enabled; toggled => { root.toggle-eq(); } } }
+                            }
+                            if PlayerState.eq-enabled: VerticalLayout {
+                                HorizontalLayout {
+                                    padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 4px; padding-bottom: 12px; spacing: 6px;
+                                    for p in root.eq-presets: TouchArea {
+                                        height: 26px; width: 52px;
+                                        clicked => { root.eq-preset = p; root.set-eq-preset(p); }
+                                        Rectangle {
+                                            background: root.eq-preset == p ? Theme.accent : (parent.has-hover ? Theme.hover-strong : Theme.hover);
+                                            border-radius: Theme.radius-sm;
+                                            Text {
+                                                text: p == "Flat" ? @tr("Flat") : p == "Bass" ? @tr("Bass") : p == "Treble" ? @tr("Treble") : p == "Vocal" ? @tr("Vocal") : @tr("Rock");
+                                                color: root.eq-preset == p ? Theme.on-accent : #ffffffb3;
+                                                font-size: 11px; horizontal-alignment: center; vertical-alignment: center;
+                                            }
+                                        }
+                                    }
+                                    Rectangle { horizontal-stretch: 1; }
+                                    VerticalLayout { alignment: center; TextButton { text: @tr("Reset"); confirm-on-click: true; clicked => { root.eq-preset = "Flat"; root.reset-eq(); } } }
+                                }
+                                for label[i] in root.eq-labels: HorizontalLayout {
+                                    padding-left: Theme.pad; padding-right: Theme.pad; height: 30px; spacing: 10px;
+                                    Text { text: label; color: #ffffff8c; font-size: 11px; width: 44px; horizontal-alignment: right; vertical-alignment: center; }
+                                    HSlider { value: PlayerState.eq-bands[i]; minimum: -12; maximum: 12; bipolar: true; changed(v) => { PlayerState.eq-bands[i] = round(v); root.eq-preset = ""; root.set-eq(i, round(v)); } }
+                                    Text { text: (PlayerState.eq-bands[i] > 0 ? "+" : "") + PlayerState.eq-bands[i]; color: #ffffff8c; font-size: 11px; width: 26px; horizontal-alignment: right; vertical-alignment: center; }
+                                }
+                            }
+                        }
+                        if PlayerState.settings-tab == "subtitles": VerticalLayout {
+                            SettingNavRow { icon: Ic.language; title: @tr("Preferred Subtitle Language"); value: PlayerState.pref-sub-lang == "" ? @tr("Auto") : PlayerState.pref-sub-name; clicked => { PlayerState.settings-dialog = "subLang"; } }
+                            SettingNavRow { icon: Ic.format-color-text; title: @tr("Subtitle Encoding"); value: PlayerState.sub-encoding == "" ? @tr("Auto") : PlayerState.sub-encoding-name; clicked => { PlayerState.settings-dialog = "subEncoding"; } }
+                            SettingToggleRow { icon: Ic.subtitles; title: @tr("Apply Embedded Styles"); on: PlayerState.apply-embedded-styles; toggled => { PlayerState.apply-embedded-styles = !PlayerState.apply-embedded-styles; root.toggle-embedded-styles(); } }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 16px;
+                                Rectangle { height: 1px; background: #ffffff14; }
+                            }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 16px; height: 34px;
+                                Text { text: @tr("Style"); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; horizontal-stretch: 1; vertical-alignment: center; }
+                                VerticalLayout { alignment: center; TextButton { text: @tr("Reset"); confirm-on-click: true; clicked => { root.reset-sub-style(); } } }
+                            }
+                            SettingNavRow { icon: Ic.text-fields; title: @tr("Font"); value: PlayerState.sub-font; clicked => { PlayerState.settings-dialog = "font"; } }
+                            SettingToggleRow { icon: Ic.format-bold; title: @tr("Bold"); on: PlayerState.sub-bold; toggled => { PlayerState.sub-bold = !PlayerState.sub-bold; root.apply-sub-style(); } }
+                            SettingSliderRow { icon: Ic.format-size; title: @tr("Size"); value: "\{PlayerState.sub-size}"; svalue: PlayerState.sub-size; minimum: 10; maximum: 100; changed(v) => { PlayerState.sub-size = round(v); root.apply-sub-style(); } }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap; height: 50px;
+                                VerticalLayout { alignment: center; AppIcon { data: Ic.format-color-text; size: 20px; color: #ffffff8c; } }
+                                VerticalLayout {
+                                    alignment: center; spacing: 2px; horizontal-stretch: 1;
+                                    Text { text: @tr("Text Color"); color: #ffffffe6; font-size: 13px; }
+                                    Text { text: PlayerState.sub-color-hex; color: #ffffff73; font-size: 11px; }
+                                }
+                                VerticalLayout { alignment: center; Rectangle { width: 44px; height: 24px; border-radius: 4px; background: PlayerState.sub-color; border-width: 1px; border-color: #ffffff59; TouchArea { clicked => { root.pick-color("text"); } } } }
+                            }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap; height: 50px;
+                                VerticalLayout { alignment: center; AppIcon { data: Ic.palette; size: 20px; color: #ffffff8c; } }
+                                VerticalLayout {
+                                    alignment: center; spacing: 2px; horizontal-stretch: 1;
+                                    Text { text: @tr("Border Color"); color: #ffffffe6; font-size: 13px; }
+                                    Text { text: PlayerState.sub-border-color-hex; color: #ffffff73; font-size: 11px; }
+                                }
+                                VerticalLayout { alignment: center; Rectangle { width: 44px; height: 24px; border-radius: 4px; background: PlayerState.sub-border-color; border-width: 1px; border-color: #ffffff59; TouchArea { clicked => { root.pick-color("border"); } } } }
+                            }
+                            SettingSliderRow { icon: Ic.line-weight; title: @tr("Border Size"); value: "\{PlayerState.sub-border-size}"; svalue: PlayerState.sub-border-size; minimum: 0; maximum: 10; changed(v) => { PlayerState.sub-border-size = round(v); root.apply-sub-style(); } }
+                            SettingSliderRow { icon: Ic.align-bottom; title: @tr("Position"); value: "\{PlayerState.sub-position}%"; svalue: PlayerState.sub-position; minimum: 0; maximum: 100; changed(v) => { PlayerState.sub-position = round(v); root.apply-sub-style(); } }
+                        }
+                        if PlayerState.settings-tab == "shortcuts": VerticalLayout {
+                            for s in PlayerState.shortcuts: VerticalLayout {
+                                if s.first-in-category: Text { text: root.category-label(s.category); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; height: 30px; vertical-alignment: bottom; }
+                                HorizontalLayout {
+                                    padding-left: Theme.pad; padding-right: Theme.pad; height: 36px; spacing: 12px;
+                                    Text { text: root.action-label(s.action); color: #ffffffe6; font-size: 13px; vertical-alignment: center; horizontal-stretch: 1; }
+                                    TouchArea {
+                                        width: 110px; height: 26px;
+                                        clicked => { PlayerState.rebinding-action = s.action; }
+                                        Rectangle {
+                                            background: PlayerState.rebinding-action == s.action ? Theme.accent.with-alpha(0.25) : #ffffff10;
+                                            border-radius: Theme.radius-sm;
+                                            Text { text: PlayerState.rebinding-action == s.action ? @tr("Press a key...") : s.key; color: PlayerState.rebinding-action == s.action ? Theme.accent : #ffffffcc; font-size: 12px; horizontal-alignment: center; vertical-alignment: center; }
+                                        }
+                                    }
+                                }
+                            }
+                            HorizontalLayout {
+                                padding: 16px;
+                                rsa := TouchArea { height: 30px; clicked => { root.reset-shortcuts(); root.sc-reset-done = true; }
+                                    Rectangle { background: rsa.has-hover ? #ffffff14 : #ffffff0a; border-radius: Theme.radius-sm; Text { text: @tr("Reset All Shortcuts"); color: root.sc-reset-done ? Theme.accent : (rsa.has-hover ? #ffffffcc : #ffffff8c); font-size: 12px; horizontal-alignment: center; vertical-alignment: center; } }
+                                }
+                            }
+                        }
+                        if PlayerState.settings-tab == "about": VerticalLayout {
+                            VerticalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; spacing: 4px;
+                                Text { text: "Vayou"; color: #ffffffe6; font-size: 22px; font-weight: 700; }
+                                Text { text: @tr("Native video player"); color: #ffffff8c; font-size: 12px; }
+                                Text { text: "v" + PlayerState.app-version; color: #ffffff59; font-size: 12px; }
+                            }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 24px; height: 42px;
+                                Text { text: @tr("Updates"); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; vertical-alignment: center; }
+                            }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; spacing: 12px; min-height: 56px;
+                                VerticalLayout {
+                                    alignment: center; spacing: 3px; horizontal-stretch: 1;
+                                    Text { text: @tr("Application updates"); color: #ffffffe6; font-size: 13px; }
+                                    Text {
+                                        text: PlayerState.update-status == 1 ? @tr("Checking…")
+                                            : PlayerState.update-status == 2 ? @tr("You're on the latest version.")
+                                            : PlayerState.update-status == 3 ? @tr("Version {} is available.", PlayerState.update-detail)
+                                            : PlayerState.update-status == 4 ? @tr("Couldn't update: {}", PlayerState.update-detail)
+                                            : PlayerState.update-status == 5 ? @tr("Downloading and verifying…")
+                                            : PlayerState.update-status == 6 ? @tr("Update installed — restart to apply.")
+                                            : @tr("Check whether a newer version is available.");
+                                        color: (PlayerState.update-status == 3 || PlayerState.update-status == 6) ? Theme.accent : #ffffff73; font-size: 11px; wrap: word-wrap;
+                                    }
+                                    if PlayerState.update-status == 4: TextButton {
+                                        text: @tr("Open releases page"); font-size: 11px;
+                                        clicked => { root.open-release-page(); }
+                                    }
+                                }
+                                VerticalLayout {
+                                    alignment: center;
+                                    TextButton {
+                                        text: PlayerState.update-status == 6 ? @tr("Restart now")
+                                            : PlayerState.update-status == 3 ? @tr("Install")
+                                            : PlayerState.update-status == 5 ? @tr("Installing…")
+                                            : PlayerState.update-status == 1 ? @tr("Checking…")
+                                            : @tr("Check for updates");
+                                        font-size: 12px;
+                                        clicked => {
+                                            if (PlayerState.update-status == 6) { root.relaunch-app(); }
+                                            else if (PlayerState.update-status == 3) { root.install-update(); }
+                                            else if (PlayerState.update-status != 1 && PlayerState.update-status != 5) { root.check-updates(); }
+                                        }
+                                    }
+                                }
+                            }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 24px; height: 42px;
+                                Text { text: @tr("Reset"); color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; vertical-alignment: center; }
+                            }
+                            HorizontalLayout {
+                                padding-left: Theme.pad; padding-right: Theme.pad; spacing: 12px; min-height: 56px;
+                                VerticalLayout {
+                                    alignment: center; spacing: 3px; horizontal-stretch: 1;
+                                    Text { text: @tr("Restore defaults"); color: #ffffffe6; font-size: 13px; }
+                                    Text { text: @tr("Reset every setting to its default value."); color: #ffffff73; font-size: 11px; wrap: word-wrap; }
+                                }
+                                VerticalLayout {
+                                    alignment: center;
+                                    TextButton {
+                                        text: @tr("Restore Defaults");
+                                        font-size: 12px;
+                                        confirm-on-click: true;
+                                        clicked => { root.restore-defaults(); }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // --- Options dialog (centered picker), opened from the settings rows ---
+    if PlayerState.settings-dialog != "": Rectangle {
+        background: #00000066;
+        TouchArea { clicked => { PlayerState.settings-dialog = ""; } }
+        MenuSurface {
+            width: 300px;
+            height: min(root.height - 80px, 460px);
+            x: (root.width - self.width) / 2;
+            y: (root.height - self.height) / 2;
+            TouchArea {}
+            VerticalLayout {
+                HorizontalLayout {
+                    padding-left: Theme.pad; padding-right: Theme.pad;
+                    Text {
+                        text: PlayerState.settings-dialog == "language" ? @tr("Language")
+                            : PlayerState.settings-dialog == "speed" ? @tr("Default Speed")
+                            : PlayerState.settings-dialog == "font" ? @tr("Font")
+                            : PlayerState.settings-dialog == "audioLang" ? @tr("Preferred Audio Language")
+                            : PlayerState.settings-dialog == "subLang" ? @tr("Preferred Subtitle Language")
+                            : @tr("Subtitle Encoding");
+                        color: #ffffffe6; font-size: 14px; font-weight: 600; height: 48px;
+                        horizontal-stretch: 1; vertical-alignment: center;
+                    }
+                }
+                ScrollView {
+                    VerticalLayout {
+                        if PlayerState.settings-dialog == "language": VerticalLayout {
+                            for l in root.ui-languages: MenuItem { show-check: true; checked: PlayerState.ui-language == l.code; active: PlayerState.ui-language == l.code; label: l.name; clicked => { PlayerState.ui-language = l.code; PlayerState.ui-language-name = l.name; root.set-ui-language(l.code); PlayerState.settings-dialog = ""; } }
+                        }
+                        if PlayerState.settings-dialog == "speed": VerticalLayout {
+                            for s in Catalog.speeds: MenuItem { show-check: true; checked: PlayerState.def-speed == s; active: PlayerState.def-speed == s; label: "\{s}x"; clicked => { PlayerState.def-speed = s; root.set-def-speed(s); PlayerState.settings-dialog = ""; } }
+                        }
+                        if PlayerState.settings-dialog == "font": VerticalLayout {
+                            for f in Catalog.sub-fonts: MenuItem { show-check: true; checked: PlayerState.sub-font == f; active: PlayerState.sub-font == f; label: f; clicked => { PlayerState.sub-font = f; root.apply-sub-style(); PlayerState.settings-dialog = ""; } }
+                        }
+                        if PlayerState.settings-dialog == "audioLang": VerticalLayout {
+                            for l in root.track-langs: MenuItem { show-check: true; checked: PlayerState.pref-audio-lang == l.code; active: PlayerState.pref-audio-lang == l.code; label: l.code == "" ? @tr("Auto") : l.name; clicked => { PlayerState.pref-audio-lang = l.code; PlayerState.pref-audio-name = l.name; root.set-pref-audio(l.code); PlayerState.settings-dialog = ""; } }
+                        }
+                        if PlayerState.settings-dialog == "subLang": VerticalLayout {
+                            for l in root.track-langs: MenuItem { show-check: true; checked: PlayerState.pref-sub-lang == l.code; active: PlayerState.pref-sub-lang == l.code; label: l.code == "" ? @tr("Auto") : l.name; clicked => { PlayerState.pref-sub-lang = l.code; PlayerState.pref-sub-name = l.name; root.set-pref-sub(l.code); PlayerState.settings-dialog = ""; } }
+                        }
+                        if PlayerState.settings-dialog == "subEncoding": VerticalLayout {
+                            for l in root.sub-encodings: MenuItem { show-check: true; checked: PlayerState.sub-encoding == l.code; active: PlayerState.sub-encoding == l.code; label: l.code == "" ? @tr("Auto") : l.name; clicked => { PlayerState.sub-encoding = l.code; PlayerState.sub-encoding-name = l.name; root.set-sub-encoding(l.code); PlayerState.settings-dialog = ""; } }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

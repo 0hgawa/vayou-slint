@@ -1,0 +1,445 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh\n"
+
+msgid "Open File"
+msgstr "打开文件"
+
+msgid "Open URL"
+msgstr "打开URL"
+
+msgid "Pause"
+msgstr "暂停"
+
+msgid "Play"
+msgstr "播放"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Subtitles"
+msgstr "字幕"
+
+msgid "Audio"
+msgstr "音频"
+
+msgid "Speed"
+msgstr "速度"
+
+msgid "Chapters"
+msgstr "章节"
+
+msgid "Aspect Ratio"
+msgstr "画面比例"
+
+msgid "A-B Loop"
+msgstr "A-B 循环"
+
+msgid "Set A"
+msgstr "设置 A 点"
+
+msgid "Set B"
+msgstr "设置 B 点"
+
+msgid "Screenshot"
+msgstr "截图"
+
+msgid "Screenshot saved"
+msgstr "截图已保存"
+
+msgid "Media Info"
+msgstr "媒体信息"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Always on Top"
+msgstr "置顶"
+
+msgid "Sleep Timer"
+msgstr "睡眠定时器"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Off"
+msgstr "关"
+
+msgid "Auto"
+msgstr "自动"
+
+msgid "No subtitle tracks"
+msgstr "无字幕轨道"
+
+msgid "No audio tracks"
+msgstr "无音频轨道"
+
+msgid "Disable"
+msgstr "禁用"
+
+msgid "Open local subtitle"
+msgstr "打开本地字幕"
+
+msgid "ON"
+msgstr "开"
+
+msgid "Delay"
+msgstr "延迟"
+
+msgid "Translate"
+msgstr "翻译"
+
+msgid "Style"
+msgstr "样式"
+
+msgid "Reset"
+msgstr "重置"
+
+msgid "Font"
+msgstr "字体"
+
+msgid "Size"
+msgstr "大小"
+
+msgid "Text Color"
+msgstr "文字颜色"
+
+msgid "Border Color"
+msgstr "边框颜色"
+
+msgid "Border Size"
+msgstr "边框大小"
+
+msgid "Position"
+msgstr "位置"
+
+msgid "Text"
+msgstr "文字"
+
+msgid "Bold"
+msgstr "??"
+
+msgid "Border"
+msgstr "边框"
+
+msgid "Playlist"
+msgstr "播放列表"
+
+msgid "Empty playlist"
+msgstr "播放列表为空"
+
+msgid "+ Files"
+msgstr "+ 文件"
+
+msgid "+ Folder"
+msgstr "+ 文件夹"
+
+msgid "Clear"
+msgstr "清空"
+
+msgid "Remove"
+msgstr "移除"
+
+msgid "Shuffle"
+msgstr "随机播放"
+
+msgid "Repeat"
+msgstr "重复"
+
+msgid "items"
+msgstr "项"
+
+msgid "Search online..."
+msgstr "在线搜索..."
+
+msgid "Search Online"
+msgstr "在线搜索"
+
+msgid "Search subtitle"
+msgstr "搜索字幕"
+
+msgid "Searching..."
+msgstr "搜索中..."
+
+msgid "No results"
+msgstr "无结果"
+
+msgid "Download failed"
+msgstr "下载失败"
+
+msgid "File"
+msgstr "文件"
+
+msgid "Resolution"
+msgstr "分辨率"
+
+msgid "Video Codec"
+msgstr "视频编解码器"
+
+msgid "Audio Codec"
+msgstr "音频编解码器"
+
+msgid "FPS"
+msgstr "FPS"
+
+msgid "Video Bitrate"
+msgstr "视频比特率"
+
+msgid "Audio Bitrate"
+msgstr "音频比特率"
+
+msgid "Duration"
+msgstr "时长"
+
+msgid "File Size"
+msgstr "文件大小"
+
+msgid "General"
+msgstr "常规"
+
+msgid "Video"
+msgstr "视频"
+
+msgid "Language"
+msgstr "语言"
+
+msgid "Preferred Audio Language"
+msgstr "首选音频"
+
+msgid "Preferred Subtitle Language"
+msgstr "首选字幕"
+
+msgid "Deinterlace"
+msgstr "反交错"
+
+msgid "Default Volume"
+msgstr "默认音量"
+
+msgid "Default Speed"
+msgstr "默认速度"
+
+msgid "Remember Position"
+msgstr "记住播放位置"
+
+msgid "Auto Play"
+msgstr "自动播放"
+
+msgid "Remember Audio/Subtitle"
+msgstr "记住音频/字幕"
+
+msgid "Subtitle Encoding"
+msgstr "字幕编码"
+
+msgid "Color"
+msgstr "颜色"
+
+msgid "Brightness"
+msgstr "亮度"
+
+msgid "Contrast"
+msgstr "对比度"
+
+msgid "Saturation"
+msgstr "饱和度"
+
+msgid "Zoom"
+msgstr "缩放"
+
+msgid "Normalization"
+msgstr "音频标准化"
+
+msgid "Volume Boost"
+msgstr "音量增强"
+
+msgid "Equalizer"
+msgstr "均衡器"
+
+msgid "Apply Embedded Styles"
+msgstr "应用嵌入样式"
+
+msgid "Restore Defaults"
+msgstr "恢复默认"
+
+msgid "Previous"
+msgstr "上一个"
+
+msgid "Next"
+msgstr "下一个"
+
+msgid "Fullscreen"
+msgstr "全屏"
+
+msgid "Playback speed"
+msgstr "播放速度"
+
+msgid "Menu"
+msgstr "菜单"
+
+msgid "Minimize"
+msgstr "最小化"
+
+msgid "Maximize"
+msgstr "最大化"
+
+msgid "Close"
+msgstr "关闭"
+
+msgid "Play / Pause"
+msgstr "播放 / 暂停"
+
+msgid "Seek Forward (5s)"
+msgstr "快进 (5秒)"
+
+msgid "Seek Forward (30s)"
+msgstr "快进 (30秒)"
+
+msgid "Seek Back (5s)"
+msgstr "快退 (5秒)"
+
+msgid "Seek Back (30s)"
+msgstr "快退 (30秒)"
+
+msgid "Frame Step"
+msgstr "下一帧"
+
+msgid "Frame Back"
+msgstr "上一帧"
+
+msgid "Speed Up"
+msgstr "加速"
+
+msgid "Speed Down"
+msgstr "减速"
+
+msgid "Volume Up"
+msgstr "增大音量"
+
+msgid "Volume Down"
+msgstr "减小音量"
+
+msgid "Mute"
+msgstr "静音"
+
+msgid "Cycle Subtitles"
+msgstr "切换字幕"
+
+msgid "Cycle Audio"
+msgstr "切换音频"
+
+msgid "Shortcuts"
+msgstr "快捷键"
+
+msgid "Playback"
+msgstr "播放"
+
+msgid "Volume"
+msgstr "音量"
+
+msgid "Tracks"
+msgstr "轨道"
+
+msgid "Navigation"
+msgstr "导航"
+
+msgid "Reset All Shortcuts"
+msgstr "重置所有快捷键"
+
+msgid "Press a key..."
+msgstr "按下一个键..."
+
+msgid "Drop file to play"
+msgstr "拖放文件以播放"
+
+msgid "Vayou"
+msgstr "Vayou"
+
+msgid "Drop a file here or press"
+msgstr "将文件拖放到此处或按"
+
+msgid "to open"
+msgstr "打开"
+
+msgid "OK"
+msgstr "好的"
+
+msgid "About"
+msgstr "关于"
+
+msgid "Interface"
+msgstr "界面"
+
+msgid "Output"
+msgstr "输出"
+
+msgid "Flat"
+msgstr "平坦的"
+
+msgid "Bass"
+msgstr "低音"
+
+msgid "Treble"
+msgstr "高音"
+
+msgid "Vocal"
+msgstr "声乐"
+
+msgid "Rock"
+msgstr "岩石"
+
+msgid "Native video player"
+msgstr "原生视频播放器"
+
+msgid "Updates"
+msgstr "更新"
+
+msgid "Application updates"
+msgstr "应用程序更新"
+
+msgid "Checking…"
+msgstr "检查…"
+
+msgid "You're on the latest version."
+msgstr "您使用的是最新版本。"
+
+msgid "Downloading and verifying…"
+msgstr "正在下载并验证..."
+
+msgid "Update installed — restart to apply."
+msgstr "已安装更新 — 重新启动以应用。"
+
+msgid "Check whether a newer version is available."
+msgstr "检查是否有新版本可用。"
+
+msgid "Open releases page"
+msgstr "打开发布页面"
+
+msgid "Restart now"
+msgstr "立即重新启动"
+
+msgid "Install"
+msgstr "安装"
+
+msgid "Installing…"
+msgstr "正在安装..."
+
+msgid "Check for updates"
+msgstr "检查更新"
+
+msgid "Restore defaults"
+msgstr "恢复默认设置"
+
+msgid "Reset every setting to its default value."
+msgstr "将每个设置重置为其默认值。"
+
+msgid "Done"
+msgstr "完毕"
+
+msgid "{} min"
+msgstr "{} 分钟"
+
+msgid "Version {} is available."
+msgstr "版本 {} 可用。"
+
+msgid "Couldn't update: {}"
+msgstr "无法更新：{}"

@@ -1,0 +1,445 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ar\n"
+
+msgid "Open File"
+msgstr "فتح ملف"
+
+msgid "Open URL"
+msgstr "فتح رابط"
+
+msgid "Pause"
+msgstr "إيقاف مؤقت"
+
+msgid "Play"
+msgstr "تشغيل"
+
+msgid "Stop"
+msgstr "إيقاف"
+
+msgid "Subtitles"
+msgstr "الترجمات"
+
+msgid "Audio"
+msgstr "الصوت"
+
+msgid "Speed"
+msgstr "السرعة"
+
+msgid "Chapters"
+msgstr "الفصول"
+
+msgid "Aspect Ratio"
+msgstr "نسبة العرض"
+
+msgid "A-B Loop"
+msgstr "A-B Loop"
+
+msgid "Set A"
+msgstr "تعيين A"
+
+msgid "Set B"
+msgstr "تعيين B"
+
+msgid "Screenshot"
+msgstr "لقطة شاشة"
+
+msgid "Screenshot saved"
+msgstr "تم حفظ لقطة الشاشة"
+
+msgid "Media Info"
+msgstr "معلومات الوسائط"
+
+msgid "Settings"
+msgstr "الإعدادات"
+
+msgid "Always on Top"
+msgstr "دائمًا في المقدمة"
+
+msgid "Sleep Timer"
+msgstr "مؤقت النوم"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Off"
+msgstr "إيقاف"
+
+msgid "Auto"
+msgstr "تلقائي"
+
+msgid "No subtitle tracks"
+msgstr "لا توجد مسارات ترجمة"
+
+msgid "No audio tracks"
+msgstr "لا توجد مسارات صوتية"
+
+msgid "Disable"
+msgstr "تعطيل"
+
+msgid "Open local subtitle"
+msgstr "فتح ترجمة محلية"
+
+msgid "ON"
+msgstr "تشغيل"
+
+msgid "Delay"
+msgstr "التأخير"
+
+msgid "Translate"
+msgstr "ترجمة"
+
+msgid "Style"
+msgstr "النمط"
+
+msgid "Reset"
+msgstr "إعادة تعيين"
+
+msgid "Font"
+msgstr "الخط"
+
+msgid "Size"
+msgstr "الحجم"
+
+msgid "Text Color"
+msgstr "لون النص"
+
+msgid "Border Color"
+msgstr "لون الحدود"
+
+msgid "Border Size"
+msgstr "حجم الحدود"
+
+msgid "Position"
+msgstr "الموضع"
+
+msgid "Text"
+msgstr "النص"
+
+msgid "Bold"
+msgstr "????"
+
+msgid "Border"
+msgstr "الحدود"
+
+msgid "Playlist"
+msgstr "قائمة التشغيل"
+
+msgid "Empty playlist"
+msgstr "قائمة تشغيل فارغة"
+
+msgid "+ Files"
+msgstr "+ ملفات"
+
+msgid "+ Folder"
+msgstr "+ مجلد"
+
+msgid "Clear"
+msgstr "مسح"
+
+msgid "Remove"
+msgstr "إزالة"
+
+msgid "Shuffle"
+msgstr "خلط"
+
+msgid "Repeat"
+msgstr "تكرار"
+
+msgid "items"
+msgstr "عناصر"
+
+msgid "Search online..."
+msgstr "البحث عبر الإنترنت..."
+
+msgid "Search Online"
+msgstr "البحث عبر الإنترنت"
+
+msgid "Search subtitle"
+msgstr "بحث عن ترجمة"
+
+msgid "Searching..."
+msgstr "جارٍ البحث..."
+
+msgid "No results"
+msgstr "لا توجد نتائج"
+
+msgid "Download failed"
+msgstr "فشل التنزيل"
+
+msgid "File"
+msgstr "ملف"
+
+msgid "Resolution"
+msgstr "الدقة"
+
+msgid "Video Codec"
+msgstr "ترميز الفيديو"
+
+msgid "Audio Codec"
+msgstr "ترميز الصوت"
+
+msgid "FPS"
+msgstr "FPS"
+
+msgid "Video Bitrate"
+msgstr "معدل بت الفيديو"
+
+msgid "Audio Bitrate"
+msgstr "معدل بت الصوت"
+
+msgid "Duration"
+msgstr "المدة"
+
+msgid "File Size"
+msgstr "حجم الملف"
+
+msgid "General"
+msgstr "عام"
+
+msgid "Video"
+msgstr "الفيديو"
+
+msgid "Language"
+msgstr "اللغة"
+
+msgid "Preferred Audio Language"
+msgstr "الصوت المفضل"
+
+msgid "Preferred Subtitle Language"
+msgstr "الترجمة المفضلة"
+
+msgid "Deinterlace"
+msgstr "إزالة التشابك"
+
+msgid "Default Volume"
+msgstr "مستوى الصوت الافتراضي"
+
+msgid "Default Speed"
+msgstr "السرعة الافتراضية"
+
+msgid "Remember Position"
+msgstr "تذكّر الموضع"
+
+msgid "Auto Play"
+msgstr "تشغيل تلقائي"
+
+msgid "Remember Audio/Subtitle"
+msgstr "تذكّر الصوت/الترجمة"
+
+msgid "Subtitle Encoding"
+msgstr "ترميز الترجمة"
+
+msgid "Color"
+msgstr "اللون"
+
+msgid "Brightness"
+msgstr "السطوع"
+
+msgid "Contrast"
+msgstr "التباين"
+
+msgid "Saturation"
+msgstr "التشبّع"
+
+msgid "Zoom"
+msgstr "التكبير"
+
+msgid "Normalization"
+msgstr "التسوية"
+
+msgid "Volume Boost"
+msgstr "تعزيز الصوت"
+
+msgid "Equalizer"
+msgstr "المعادل الصوتي"
+
+msgid "Apply Embedded Styles"
+msgstr "تطبيق الأنماط المضمنة"
+
+msgid "Restore Defaults"
+msgstr "استعادة الافتراضيات"
+
+msgid "Previous"
+msgstr "السابق"
+
+msgid "Next"
+msgstr "التالي"
+
+msgid "Fullscreen"
+msgstr "ملء الشاشة"
+
+msgid "Playback speed"
+msgstr "سرعة التشغيل"
+
+msgid "Menu"
+msgstr "القائمة"
+
+msgid "Minimize"
+msgstr "تصغير"
+
+msgid "Maximize"
+msgstr "تكبير"
+
+msgid "Close"
+msgstr "إغلاق"
+
+msgid "Play / Pause"
+msgstr "تشغيل / إيقاف مؤقت"
+
+msgid "Seek Forward (5s)"
+msgstr "تقديم (5 ثوانٍ)"
+
+msgid "Seek Forward (30s)"
+msgstr "تقديم (30 ثانية)"
+
+msgid "Seek Back (5s)"
+msgstr "ترجيع (5 ثوانٍ)"
+
+msgid "Seek Back (30s)"
+msgstr "ترجيع (30 ثانية)"
+
+msgid "Frame Step"
+msgstr "إطار للأمام"
+
+msgid "Frame Back"
+msgstr "إطار للخلف"
+
+msgid "Speed Up"
+msgstr "زيادة السرعة"
+
+msgid "Speed Down"
+msgstr "تقليل السرعة"
+
+msgid "Volume Up"
+msgstr "رفع الصوت"
+
+msgid "Volume Down"
+msgstr "خفض الصوت"
+
+msgid "Mute"
+msgstr "كتم الصوت"
+
+msgid "Cycle Subtitles"
+msgstr "تبديل الترجمات"
+
+msgid "Cycle Audio"
+msgstr "تبديل الصوت"
+
+msgid "Shortcuts"
+msgstr "اختصارات"
+
+msgid "Playback"
+msgstr "التشغيل"
+
+msgid "Volume"
+msgstr "مستوى الصوت"
+
+msgid "Tracks"
+msgstr "المسارات"
+
+msgid "Navigation"
+msgstr "التنقل"
+
+msgid "Reset All Shortcuts"
+msgstr "إعادة تعيين جميع الاختصارات"
+
+msgid "Press a key..."
+msgstr "اضغط على مفتاح..."
+
+msgid "Drop file to play"
+msgstr "أسقط ملفًا هنا للتشغيل"
+
+msgid "Vayou"
+msgstr "Vayou"
+
+msgid "Drop a file here or press"
+msgstr "أسقط ملفًا هنا أو اضغط"
+
+msgid "to open"
+msgstr "للفتح"
+
+msgid "OK"
+msgstr "نعم"
+
+msgid "About"
+msgstr "عن"
+
+msgid "Interface"
+msgstr "واجهة"
+
+msgid "Output"
+msgstr "الإخراج"
+
+msgid "Flat"
+msgstr "مستوي"
+
+msgid "Bass"
+msgstr "باس"
+
+msgid "Treble"
+msgstr "ثلاثة أضعاف"
+
+msgid "Vocal"
+msgstr "صوتي"
+
+msgid "Rock"
+msgstr "صخر"
+
+msgid "Native video player"
+msgstr "مشغل فيديو أصلي"
+
+msgid "Updates"
+msgstr "التحديثات"
+
+msgid "Application updates"
+msgstr "تحديثات التطبيق"
+
+msgid "Checking…"
+msgstr "جارٍ التحقق…"
+
+msgid "You're on the latest version."
+msgstr "أنت على الإصدار الأحدث."
+
+msgid "Downloading and verifying…"
+msgstr "جارٍ التنزيل والتحقق…"
+
+msgid "Update installed — restart to apply."
+msgstr "تم تثبيت التحديث - أعد التشغيل للتقديم."
+
+msgid "Check whether a newer version is available."
+msgstr "تحقق من توفر إصدار أحدث."
+
+msgid "Open releases page"
+msgstr "فتح صفحة الإصدارات"
+
+msgid "Restart now"
+msgstr "أعد التشغيل الآن"
+
+msgid "Install"
+msgstr "ثَبَّتَ"
+
+msgid "Installing…"
+msgstr "جارٍ التثبيت…"
+
+msgid "Check for updates"
+msgstr "التحقق من وجود تحديثات"
+
+msgid "Restore defaults"
+msgstr "استعادة الإعدادات الافتراضية"
+
+msgid "Reset every setting to its default value."
+msgstr "إعادة ضبط كل إعداد إلى قيمته الافتراضية."
+
+msgid "Done"
+msgstr "منتهي"
+
+msgid "{} min"
+msgstr "{} دقيقة"
+
+msgid "Version {} is available."
+msgstr "الإصدار {} متاح."
+
+msgid "Couldn't update: {}"
+msgstr "تعذر التحديث: {}"

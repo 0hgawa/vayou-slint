@@ -1,0 +1,207 @@
+import { ScrollView } from "std-widgets.slint";
+import { Theme } from "theme.slint";
+import { Ic, AppIcon } from "icons.slint";
+import { CtrlButton, MenuItem, MenuSep, SidePanel, Stepper, SettingNavRow, SettingToggleRow, SettingSliderRow, TextButton, VScroll } from "widgets.slint";
+import { PlayerState, NamedLang, Catalog } from "state.slint";
+
+// The multi-page subtitle side panel (tracks · style · online search · translate).
+// State lives in PlayerState; the actions are declared here and forwarded to the
+// window's handlers at the instantiation site.
+export component SubtitlePanel inherits SidePanel {
+    callback reset-sub-style();
+    callback select-sub(int);
+    callback load-external-sub();
+    callback do-search();
+    callback apply-sub-style();
+    callback pick-color(string);
+    callback translate-off();
+    callback set-translate-lang(string);
+    callback set-sub-delay(float);
+    callback download-sub(int);
+
+    property <[NamedLang]> translate-langs: [
+        { code: "pt", name: "Português" }, { code: "en", name: "English" }, { code: "es", name: "Español" },
+        { code: "fr", name: "Français" }, { code: "de", name: "Deutsch" }, { code: "it", name: "Italiano" },
+        { code: "ja", name: "日本語" }, { code: "ko", name: "한국어" }, { code: "zh", name: "中文" },
+        { code: "ru", name: "Русский" }, { code: "ar", name: "العربية" }, { code: "hi", name: "हिन्दी" },
+    ];
+    property <[NamedLang]> search-langs: [
+        { code: "", name: "All" }, { code: "por", name: "Português" }, { code: "pob", name: "Português (BR)" },
+        { code: "eng", name: "English" }, { code: "spa", name: "Español" }, { code: "fre", name: "Français" },
+        { code: "ger", name: "Deutsch" }, { code: "ita", name: "Italiano" }, { code: "dut", name: "Nederlands" },
+        { code: "rus", name: "Русский" }, { code: "jpn", name: "日本語" }, { code: "chi", name: "中文" },
+        { code: "kor", name: "한국어" }, { code: "ara", name: "العربية" }, { code: "tur", name: "Türkçe" },
+        { code: "pol", name: "Polski" }, { code: "rum", name: "Română" }, { code: "hrv", name: "Hrvatski" },
+        { code: "scc", name: "Srpski" }, { code: "hun", name: "Magyar" }, { code: "cze", name: "Čeština" },
+        { code: "hin", name: "हिन्दी" },
+    ];
+
+    heading: PlayerState.sub-page == "style" ? @tr("Style")
+        : PlayerState.sub-page == "search" || PlayerState.sub-page == "searchLang" ? @tr("Search Online")
+        : PlayerState.sub-page == "translateLang" ? @tr("Translate")
+        : PlayerState.sub-page == "subfont" ? @tr("Font")
+        : @tr("Subtitles");
+    close => { PlayerState.active-panel = ""; }
+
+    if PlayerState.sub-page != "main": VerticalLayout {
+        HorizontalLayout {
+            height: 30px; padding-left: 8px; padding-right: 8px;
+            VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 16px; icon: Ic.arrow-back; square-hover: true; clicked => { PlayerState.sub-page = (PlayerState.sub-page == "searchLang") ? "search" : (PlayerState.sub-page == "subfont" ? "style" : "main"); } } }
+            Rectangle {}
+            if PlayerState.sub-page == "style": VerticalLayout { alignment: center; TextButton { text: @tr("Reset"); font-size: 12px; confirm-on-click: true; clicked => { root.reset-sub-style(); } } }
+        }
+    }
+
+    if PlayerState.sub-page == "main": VerticalLayout {
+        ScrollView {
+            height: min(submain.preferred-height, 320px);
+            submain := VerticalLayout {
+                MenuItem {
+                    show-check: true; checked: !PlayerState.sub-active;
+                    active: !PlayerState.sub-active;
+                    label: @tr("Disable"); clicked => { root.select-sub(-1); }
+                }
+                for t in PlayerState.panel-sub-tracks: MenuItem { show-check: true; checked: t.selected; active: t.selected; label: t.label; clicked => { root.select-sub(t.id); } }
+                MenuSep {}
+                MenuItem { icon: Ic.file; label: @tr("Open local subtitle"); clicked => { root.load-external-sub(); } }
+                MenuItem { icon: Ic.search; label: @tr("Search online..."); arrow: true; clicked => { PlayerState.sub-page = "search"; root.do-search(); } }
+                MenuItem {
+                    icon: Ic.translate; label: @tr("Translate"); arrow: !PlayerState.translating;
+                    value-hint: PlayerState.translating ? "\{PlayerState.tr-total > 0 ? round(PlayerState.tr-progress / PlayerState.tr-total * 100) : 0}%" : (PlayerState.translate-lang == "off" ? "" : PlayerState.translate-lang-name);
+                    clicked => { PlayerState.sub-page = "translateLang"; }
+                }
+                MenuItem { icon: Ic.style; label: @tr("Style"); arrow: true; clicked => { PlayerState.sub-page = "style"; } }
+                MenuSep {}
+            }
+        }
+        if PlayerState.tr-error != "": Rectangle {
+            background: #ff6b6b1a;
+            HorizontalLayout {
+                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 8px; padding-bottom: 8px;
+                Text { text: PlayerState.tr-error; color: #ff9a9a; font-size: 11px; wrap: word-wrap; horizontal-stretch: 1; }
+            }
+        }
+        Stepper {
+            label: @tr("Delay"); value: "\{round(PlayerState.sub-delay * 10) / 10}s";
+            dec => { PlayerState.sub-delay = round((PlayerState.sub-delay - 0.1) * 10) / 10; root.set-sub-delay(PlayerState.sub-delay); }
+            inc => { PlayerState.sub-delay = round((PlayerState.sub-delay + 0.1) * 10) / 10; root.set-sub-delay(PlayerState.sub-delay); }
+        }
+    }
+
+    if PlayerState.sub-page == "style": VScroll {
+        height: 320px;
+        VerticalLayout {
+            padding-top: 4px; padding-bottom: 8px;
+            SettingNavRow { icon: Ic.text-fields; title: @tr("Font"); value: PlayerState.sub-font; clicked => { PlayerState.sub-page = "subfont"; } }
+            SettingToggleRow { icon: Ic.format-bold; title: @tr("Bold"); on: PlayerState.sub-bold; toggled => { PlayerState.sub-bold = !PlayerState.sub-bold; root.apply-sub-style(); } }
+            SettingSliderRow { icon: Ic.format-size; title: @tr("Size"); value: "\{PlayerState.sub-size}"; svalue: PlayerState.sub-size; minimum: 10; maximum: 100; changed(v) => { PlayerState.sub-size = round(v); root.apply-sub-style(); } }
+            HorizontalLayout {
+                padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap; height: 50px;
+                VerticalLayout { alignment: center; AppIcon { data: Ic.format-color-text; size: 20px; color: #ffffff8c; } }
+                VerticalLayout {
+                    alignment: center; spacing: 2px; horizontal-stretch: 1;
+                    Text { text: @tr("Text Color"); color: #ffffffe6; font-size: 13px; }
+                    Text { text: PlayerState.sub-color-hex; color: #ffffff73; font-size: 11px; }
+                }
+                VerticalLayout { alignment: center; Rectangle { width: 44px; height: 24px; border-radius: 4px; background: PlayerState.sub-color; border-width: 1px; border-color: #ffffff59; TouchArea { clicked => { root.pick-color("text"); } } } }
+            }
+            HorizontalLayout {
+                padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap; height: 50px;
+                VerticalLayout { alignment: center; AppIcon { data: Ic.palette; size: 20px; color: #ffffff8c; } }
+                VerticalLayout {
+                    alignment: center; spacing: 2px; horizontal-stretch: 1;
+                    Text { text: @tr("Border Color"); color: #ffffffe6; font-size: 13px; }
+                    Text { text: PlayerState.sub-border-color-hex; color: #ffffff73; font-size: 11px; }
+                }
+                VerticalLayout { alignment: center; Rectangle { width: 44px; height: 24px; border-radius: 4px; background: PlayerState.sub-border-color; border-width: 1px; border-color: #ffffff59; TouchArea { clicked => { root.pick-color("border"); } } } }
+            }
+            SettingSliderRow { icon: Ic.line-weight; title: @tr("Border Size"); value: "\{PlayerState.sub-border-size}"; svalue: PlayerState.sub-border-size; minimum: 0; maximum: 10; changed(v) => { PlayerState.sub-border-size = round(v); root.apply-sub-style(); } }
+            SettingSliderRow { icon: Ic.align-bottom; title: @tr("Position"); value: "\{PlayerState.sub-position}%"; svalue: PlayerState.sub-position; minimum: 0; maximum: 100; changed(v) => { PlayerState.sub-position = round(v); root.apply-sub-style(); } }
+        }
+    }
+
+    if PlayerState.sub-page == "subfont": ScrollView {
+        height: min(fontlist.preferred-height, 320px);
+        fontlist := VerticalLayout {
+            for f in Catalog.sub-fonts: MenuItem { show-check: true; checked: PlayerState.sub-font == f; active: PlayerState.sub-font == f; label: f; clicked => { PlayerState.sub-font = f; root.apply-sub-style(); PlayerState.sub-page = "style"; } }
+        }
+    }
+
+    if PlayerState.sub-page == "translateLang": VerticalLayout {
+        if PlayerState.translating: HorizontalLayout { height: 22px; padding-right: 12px;
+            Rectangle {}
+            Text { text: "\{PlayerState.tr-total > 0 ? round(PlayerState.tr-progress / PlayerState.tr-total * 100) : 0}%"; color: #ffffff80; font-size: 11px; vertical-alignment: center; }
+        }
+        if PlayerState.tr-error != "": Rectangle {
+            background: #ff6b6b1a;
+            HorizontalLayout {
+                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 8px; padding-bottom: 8px;
+                Text { text: PlayerState.tr-error; color: #ff9a9a; font-size: 11px; wrap: word-wrap; horizontal-stretch: 1; }
+            }
+        }
+        ScrollView {
+            height: min(trlist.preferred-height, 300px);
+            trlist := VerticalLayout {
+                MenuItem { show-check: true; checked: PlayerState.translate-lang == "off"; active: PlayerState.translate-lang == "off"; label: @tr("Off"); clicked => { PlayerState.translate-lang-name = ""; root.translate-off(); PlayerState.sub-page = "main"; } }
+                MenuSep {}
+                for l in root.translate-langs: MenuItem { show-check: true; checked: PlayerState.translate-lang == l.code; active: PlayerState.translate-lang == l.code; label: l.name; clicked => { PlayerState.translate-lang-name = l.name; root.set-translate-lang(l.code); PlayerState.sub-page = "main"; } }
+            }
+        }
+    }
+
+    if PlayerState.sub-page == "searchLang": ScrollView {
+        height: min(sllist.preferred-height, 320px);
+        sllist := VerticalLayout {
+            for l in root.search-langs: MenuItem { show-check: true; checked: PlayerState.search-lang == l.code; active: PlayerState.search-lang == l.code; label: l.name; clicked => { PlayerState.search-lang = l.code; PlayerState.search-lang-name = l.name; PlayerState.sub-page = "search"; root.do-search(); } }
+        }
+    }
+
+    if PlayerState.sub-page == "search": VerticalLayout {
+        padding-left: Theme.pad; padding-right: Theme.pad; padding-bottom: 8px; spacing: 6px;
+        Rectangle {
+            height: 32px; background: #ffffff14; border-radius: Theme.radius-sm;
+            border-width: 1px; border-color: ti.has-focus ? Theme.accent : Theme.outline;
+            HorizontalLayout { padding-left: Theme.pad; padding-right: 4px; spacing: 4px;
+                ti := TextInput {
+                    text <=> PlayerState.search-query;
+                    color: white; font-size: 12px; vertical-alignment: center; horizontal-stretch: 1;
+                    single-line: true;
+                    accepted => { root.do-search(); }
+                }
+                VerticalLayout { alignment: center;
+                    searchbtn := TouchArea {
+                        width: 26px; height: 26px;
+                        clicked => { root.do-search(); }
+                        Rectangle {
+                            background: searchbtn.has-hover ? #ffffff2e : transparent;
+                            border-radius: Theme.radius-sm;
+                            AppIcon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; data: Ic.search; size: 14px; color: white; }
+                        }
+                    }
+                }
+            }
+        }
+        MenuItem { icon: Ic.globe; label: PlayerState.search-lang-name; arrow: true; clicked => { PlayerState.sub-page = "searchLang"; } }
+        ScrollView {
+            height: 240px;
+            VerticalLayout {
+                if PlayerState.searching: Text { text: @tr("Searching..."); color: #ffffff66; font-size: 12px; height: 60px; horizontal-alignment: center; vertical-alignment: center; }
+                if !PlayerState.searching && PlayerState.search-results.length == 0 && PlayerState.has-searched: Text { text: PlayerState.search-error == "" ? @tr("No results") : PlayerState.search-error; color: #ffffff4d; font-size: 12px; height: 60px; horizontal-alignment: center; vertical-alignment: center; }
+                for r[i] in PlayerState.search-results: Rectangle {
+                    height: rrow.preferred-height + 10px;
+                    ra := TouchArea { clicked => { if (PlayerState.downloading-index < 0) { root.download-sub(i); } } }
+                    background: ra.has-hover ? #ffffff14 : transparent;
+                    rrow := HorizontalLayout {
+                        padding: 6px; spacing: 8px;
+                        Text { text: r.lang; color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; width: 28px; }
+                        VerticalLayout {
+                            horizontal-stretch: 1; spacing: 2px;
+                            Text { text: r.name; color: #ffffffd9; font-size: 12px; wrap: word-wrap; }
+                            Text { text: r.downloads + (r.matched != "" ? "  •  " + r.matched : ""); color: #ffffff66; font-size: 11px; }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

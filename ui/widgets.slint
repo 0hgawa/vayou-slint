@@ -1,0 +1,526 @@
+import { Theme } from "theme.slint";
+import { Ic, AppIcon } from "icons.slint";
+
+// Icon button with the .ctrl-btn hover treatment (circular highlight on hover,
+// rectangular for title-bar buttons, red for the close button).
+export component CtrlButton {
+    in property <string> icon;
+    in property <bool> active;
+    in property <length> icon-size: 20px;
+    in property <bool> danger;
+    in property <bool> square-hover;
+    callback clicked;
+    width: 36px;
+    height: 36px;
+    ta := TouchArea { clicked => { root.clicked(); } }
+    Rectangle {
+        background: ta.has-hover ? (root.danger ? #ef4444cc : #ffffff2e) : transparent;
+        // Instant hover (no fade). Shape stays constant — tying the radius to
+        // has-hover made it pop from circle to square, so it's kept fixed.
+        border-radius: (root.danger || root.square-hover) ? Theme.radius-sm : self.height / 2;
+        AppIcon {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            data: root.icon;
+            size: root.icon-size;
+            color: root.active ? Theme.accent : #ffffffe6;
+        }
+    }
+}
+
+// M3 toggle switch (44x22), mirrors .vayou-switch.
+export component Switch {
+    in property <bool> on;
+    callback toggled;
+    width: 44px;
+    height: 22px;
+    TouchArea { clicked => { root.toggled(); } }
+    Rectangle {
+        y: 6px;
+        height: 10px;
+        width: 100%;
+        border-radius: 5px;
+        background: root.on ? Theme.accent.with-alpha(0.4) : #c2c7cf66;
+        animate background { duration: Theme.slow; }
+    }
+    Rectangle {
+        y: 2px;
+        width: 18px;
+        height: 18px;
+        x: root.on ? parent.width - self.width : 0px;
+        border-radius: 9px;
+        background: root.on ? Theme.accent : #c2c7cf;
+        animate x { duration: Theme.slow; easing: ease-in-out; }
+        animate background { duration: Theme.slow; }
+    }
+}
+
+// Horizontal slider. Normal fill (0 → value) or bipolar fill (neutral → value).
+export component HSlider {
+    in property <float> value;
+    in property <float> minimum: 0;
+    in property <float> maximum: 100;
+    in property <bool> bipolar;
+    callback changed(float);
+    min-height: 16px;
+    vertical-stretch: 0;
+
+    property <float> p: (root.maximum > root.minimum) ? (root.value - root.minimum) / (root.maximum - root.minimum) : 0;
+    property <float> c: root.bipolar ? (0 - root.minimum) / (root.maximum - root.minimum) : 0;
+
+    ta := TouchArea {
+        clicked => { root.emit(); }
+        moved => { if (self.pressed) { root.emit(); } }
+    }
+    Rectangle {
+        y: parent.height / 2 - 2px;
+        height: 4px;
+        background: Theme.surface-container-highest;
+        border-radius: 2px;
+        Rectangle {
+            x: min(root.c, root.p) * parent.width;
+            width: abs(root.p - root.c) * parent.width;
+            height: parent.height;
+            background: Theme.accent;
+            border-radius: 2px;
+        }
+    }
+    Rectangle {
+        x: root.p * (parent.width - self.width);
+        y: parent.height / 2 - self.height / 2;
+        width: root.bipolar ? 14px : 12px;
+        height: self.width;
+        border-radius: self.width / 2;
+        background: root.bipolar ? white : Theme.accent;
+    }
+    function emit() {
+        root.changed(clamp(root.minimum + (ta.mouse-x / ta.width) * (root.maximum - root.minimum), root.minimum, root.maximum));
+    }
+}
+
+// Volume control: mute button + slider as ONE unit (YouTube-style). The slider
+// stays collapsed until the group is hovered, the whole group shares a single
+// hover highlight, and hovering the button OR the slider keeps it expanded.
+export component VolumeControl {
+    in property <float> volume;
+    in property <float> maximum: 100;
+    in property <bool> muted;
+    in property <string> icon-on;
+    in property <string> icon-off;
+    callback toggle-mute();
+    callback set-volume(float);
+    height: 36px;
+    property <bool> hovered: mute-ta.has-hover || track-ta.has-hover;
+    property <float> frac: root.maximum > 0 ? (root.muted ? 0 : root.volume) / root.maximum : 0;
+    width: root.hovered ? 112px : 36px;
+    animate width { duration: 160ms; easing: ease-in-out; }
+    Rectangle {
+        background: root.hovered ? #ffffff1f : transparent;
+        border-radius: 18px;
+        clip: true;
+        HorizontalLayout {
+            spacing: 0px;
+            // Mute toggle
+            Rectangle {
+                width: 36px;
+                mute-ta := TouchArea { clicked => { root.toggle-mute(); } }
+                AppIcon {
+                    x: (parent.width - self.width) / 2;
+                    y: (parent.height - self.height) / 2;
+                    data: (root.muted || root.volume == 0) ? root.icon-off : root.icon-on;
+                    size: 20px;
+                    color: #ffffffe6;
+                }
+            }
+            // Slider (revealed when the group expands). Clipped to its own
+            // bounds so the thumb/track don't bleed into the button while
+            // collapsed (width 0).
+            Rectangle {
+                horizontal-stretch: 1;
+                clip: true;
+                track-ta := TouchArea {
+                    clicked => { root.seek(self.mouse-x, self.width); }
+                    moved => { if (self.pressed) { root.seek(self.mouse-x, self.width); } }
+                }
+                Rectangle {
+                    x: 0;
+                    width: parent.width - 12px;
+                    y: parent.height / 2 - 2px;
+                    height: 4px;
+                    background: Theme.surface-container-highest;
+                    border-radius: 2px;
+                    Rectangle {
+                        x: 0;
+                        width: parent.width * root.frac;
+                        height: parent.height;
+                        background: Theme.accent;
+                        border-radius: 2px;
+                    }
+                }
+                Rectangle {
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 6px;
+                    background: white;
+                    x: (parent.width - 12px) * root.frac;
+                    y: parent.height / 2 - self.height / 2;
+                }
+            }
+        }
+    }
+    function seek(mx: length, w: length) {
+        root.set-volume(clamp(mx / (w - 12px) * root.maximum, 0, root.maximum));
+    }
+}
+
+// A row in a context menu or side panel: optional left icon (or a check
+// column), label, and an optional trailing value / key-hint / arrow.
+export component MenuItem {
+    in property <string> icon;
+    in property <bool> show-check;
+    in property <bool> checked;
+    in property <string> label;
+    in property <string> key-hint;
+    in property <string> value-hint;
+    in property <bool> arrow;
+    in property <bool> active;
+    callback clicked;
+    height: Theme.row-h;
+    ta := TouchArea { clicked => { root.clicked(); } }
+    // Full-bleed hover (mirrors the WebView build): the row fills the menu
+    // edge-to-edge and the menu's own clip rounds the top/bottom corners.
+    Rectangle {
+        background: ta.has-hover ? Theme.hover : transparent;
+    }
+    HorizontalLayout {
+        padding-left: Theme.pad;
+        padding-right: Theme.pad;
+        spacing: Theme.gap;
+        if root.show-check: VerticalLayout {
+            alignment: center;
+            AppIcon { data: Ic.check; size: 14px; color: Theme.accent; opacity: root.checked ? 1 : 0; }
+        }
+        if !root.show-check && root.icon != "": VerticalLayout {
+            alignment: center;
+            AppIcon { data: root.icon; size: 16px; color: root.active ? Theme.accent : #ffffff8c; }
+        }
+        Text {
+            text: root.label;
+            color: root.active ? Theme.accent : #ffffffe6;
+            font-size: 13px;
+            vertical-alignment: center;
+            horizontal-stretch: 1;
+            overflow: elide;
+        }
+        if root.value-hint != "": Text { text: root.value-hint; color: Theme.accent; font-size: 11px; vertical-alignment: center; }
+        if root.key-hint != "": Text { text: root.key-hint; color: #ffffff59; font-size: 12px; vertical-alignment: center; }
+        if root.arrow: VerticalLayout { alignment: center; AppIcon { data: Ic.chevron-right; size: 16px; color: #ffffff59; } }
+    }
+}
+
+// 1px divider used inside menus / panels.
+export component MenuSep inherits Rectangle {
+    height: 1px;
+    background: #ffffff14;
+}
+
+// A "− value +" stepper row (subtitle / audio delay).
+export component Stepper {
+    in property <string> label;
+    in property <string> value;
+    callback dec();
+    callback inc();
+    height: Theme.row-h;
+    HorizontalLayout {
+        padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap;
+        Text { text: root.label; color: #ffffff80; font-size: 12px; vertical-alignment: center; horizontal-stretch: 1; }
+        VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 18px; icon: Ic.minus; square-hover: true; clicked => { root.dec(); } } }
+        Text { text: root.value; color: white; font-size: 12px; width: 52px; horizontal-alignment: center; vertical-alignment: center; }
+        VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 18px; icon: Ic.plus; square-hover: true; clicked => { root.inc(); } } }
+    }
+}
+
+// Floating popover surface for menus / dropdowns / pickers: a tonal gradient,
+// a hairline border with a 1px highlight along the top edge, and a directional
+// drop shadow for elevation. Caller's elements fill it via @children.
+export component MenuSurface inherits Rectangle {
+    background: @linear-gradient(180deg, Theme.menu-top 0%, Theme.menu-bottom 100%);
+    border-radius: Theme.radius-md;
+    border-width: 1px;
+    border-color: Theme.menu-border;
+    drop-shadow-blur: 32px;
+    drop-shadow-offset-y: 10px;
+    drop-shadow-color: Theme.shadow;
+    clip: true;
+    // Hairline of light along the top edge — clipped, so it follows the corners.
+    Rectangle { y: 0; width: 100%; height: 1px; background: Theme.menu-highlight; }
+    @children
+}
+
+// A floating side panel anchored bottom-right above the controls, with a
+// heading row + close button. Caller's elements fill the content area.
+export component SidePanel inherits MenuSurface {
+    in property <string> heading;
+    in property <length> panel-width: 280px;
+    callback close;
+    width: root.panel-width;
+    // Hug the content height — without this it defaults to filling the whole
+    // window, leaving a huge empty panel.
+    height: col.preferred-height;
+    col := VerticalLayout {
+        HorizontalLayout {
+            padding-left: Theme.pad;
+            padding-right: 6px;
+            height: 40px;
+            Text {
+                text: root.heading;
+                color: #ffffffe6; font-size: 14px; font-weight: 600;
+                vertical-alignment: center; horizontal-stretch: 1;
+            }
+            VerticalLayout {
+                alignment: center;
+                CtrlButton { width: 26px; height: 26px; icon-size: 13px; icon: Ic.close-x; square-hover: true; clicked => { root.close(); } }
+            }
+        }
+        @children
+    }
+}
+
+// Settings row with a trailing toggle switch.
+export component SettingToggleRow {
+    in property <string> icon;
+    in property <string> title;
+    in property <bool> on;
+    callback toggled;
+    height: Theme.setting-h;
+    ta := TouchArea { clicked => { root.toggled(); } }
+    Rectangle { background: ta.has-hover ? #ffffff0a : transparent; }
+    HorizontalLayout {
+        padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap;
+        VerticalLayout { alignment: center; AppIcon { data: root.icon; size: 20px; color: #ffffff8c; } }
+        Text { text: root.title; color: #ffffffe6; font-size: 13px; vertical-alignment: center; horizontal-stretch: 1; overflow: elide; }
+        VerticalLayout { alignment: center; Switch { on: root.on; toggled => { root.toggled(); } } }
+    }
+}
+
+// Settings row that opens a picker: the current value sits as a subtitle under
+// the title (mirrors the WebView), with a trailing chevron.
+export component SettingNavRow {
+    in property <string> icon;
+    in property <string> title;
+    in property <string> value;
+    callback clicked;
+    height: 50px;
+    ta := TouchArea { clicked => { root.clicked(); } }
+    Rectangle { background: ta.has-hover ? #ffffff0a : transparent; }
+    HorizontalLayout {
+        padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap;
+        VerticalLayout { alignment: center; AppIcon { data: root.icon; size: 20px; color: #ffffff8c; } }
+        VerticalLayout {
+            alignment: center; spacing: 2px; horizontal-stretch: 1;
+            Text { text: root.title; color: #ffffffe6; font-size: 13px; overflow: elide; }
+            if root.value != "": Text { text: root.value; color: #ffffff73; font-size: 11px; overflow: elide; }
+        }
+        VerticalLayout { alignment: center; AppIcon { data: Ic.chevron-right; size: 16px; color: #ffffff4d; } }
+    }
+}
+
+// A subtle inline text button (the "Reset" links) with a hover background and
+// a slightly brighter label on hover. Hugs its content.
+export component TextButton {
+    in property <string> text;
+    in property <length> font-size: 11px;
+    // When set, a click briefly tints the label accent so the action (e.g. a
+    // reset) doesn't feel like a no-op — colour only, so the button never shifts.
+    in property <bool> confirm-on-click;
+    callback clicked;
+    property <bool> confirmed;
+    height: 26px;
+    confirm-timer := Timer {
+        interval: 1500ms;
+        running: root.confirmed;
+        triggered => { root.confirmed = false; }
+    }
+    ta := TouchArea { clicked => { root.clicked(); root.confirmed = root.confirm-on-click; } }
+    Rectangle {
+        background: ta.has-hover ? Theme.hover : transparent;
+        border-radius: Theme.radius-sm;
+        HorizontalLayout {
+            padding-left: 10px; padding-right: 10px;
+            Text { text: root.text; color: root.confirmed ? Theme.accent : (ta.has-hover ? #ffffffe6 : #ffffff80); font-size: root.font-size; vertical-alignment: center; }
+        }
+    }
+}
+
+// Vertical scroll container with a thin, dark-themed scrollbar. The std
+// `ScrollView` renders the platform's thick grey bar on hover, which clashes
+// with the UI — this keeps the wheel/touch scrolling but draws a slim,
+// auto-hiding thumb that the caller can drag.
+export component VScroll inherits Rectangle {
+    clip: true;
+    // Report the content's natural height so parents can hug it (capping
+    // elsewhere); the Flickable still scrolls when given less. `viewport-height`
+    // is driven by the wrapper's intrinsic height (not the Flickable's own
+    // height) to avoid a binding loop when a parent sizes to this content.
+    preferred-height: inner.preferred-height;
+    fl := Flickable {
+        width: 100%;
+        height: 100%;
+        viewport-width: self.width;
+        viewport-height: inner.preferred-height;
+        inner := VerticalLayout {
+            width: fl.viewport-width;
+            @children
+        }
+    }
+    bar := Rectangle {
+        property <bool> active: fl.viewport-height > fl.height + 1px;
+        property <length> thumb-h: max(28px, fl.height * fl.height / max(fl.viewport-height, 1px));
+        property <float> frac: bar.active ? (0px - fl.viewport-y) / (fl.viewport-height - fl.height) : 0;
+        visible: bar.active;
+        width: 12px;
+        x: parent.width - self.width;
+        height: parent.height;
+        thumb := Rectangle {
+            width: tta.has-hover || tta.pressed ? 6px : 4px;
+            x: (parent.width - self.width) / 2;
+            height: bar.thumb-h;
+            y: bar.frac * (bar.height - self.height);
+            background: tta.has-hover || tta.pressed ? #ffffff8c : #ffffff40;
+            border-radius: self.width / 2;
+            animate width, background { duration: 120ms; }
+        }
+        tta := TouchArea {
+            moved => { if (self.pressed && bar.active) { root.scroll-to((self.mouse-y - bar.thumb-h / 2) / (bar.height - bar.thumb-h)); } }
+            clicked => { if (bar.active) { root.scroll-to((self.mouse-y - bar.thumb-h / 2) / (bar.height - bar.thumb-h)); } }
+        }
+    }
+    function scroll-to(f: float) {
+        fl.viewport-y = 0px - clamp(f, 0, 1) * (fl.viewport-height - fl.height);
+    }
+}
+
+// Settings row with a label/value header and a slider below.
+export component SettingSliderRow {
+    in property <string> icon;
+    in property <string> title;
+    in property <string> value;
+    in property <float> svalue;
+    in property <float> minimum;
+    in property <float> maximum;
+    in property <bool> bipolar;
+    callback changed(float);
+    height: 52px;
+    HorizontalLayout {
+        padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap;
+        VerticalLayout { alignment: center; AppIcon { data: root.icon; size: 20px; color: #ffffff8c; } }
+        VerticalLayout {
+            padding-top: 8px; padding-bottom: 8px; spacing: 4px; horizontal-stretch: 1;
+            HorizontalLayout {
+                Text { text: root.title; color: #ffffffe6; font-size: 13px; horizontal-stretch: 1; }
+                Text { text: root.value; color: #ffffff80; font-size: 11px; }
+            }
+            HSlider { value: root.svalue; minimum: root.minimum; maximum: root.maximum; bipolar: root.bipolar; changed(v) => { root.changed(v); } }
+        }
+    }
+}
+
+// In-window HSV colour picker: a saturation/value field + hue strip + preview,
+// replacing the native Win32 ChooseColor dialog with a theme-consistent overlay.
+// `hue` is 0–360, `sat`/`val` are 0–1; `current` is the live result.
+export component ColorPicker inherits MenuSurface {
+    in-out property <float> hue;
+    in-out property <float> sat;
+    in-out property <float> val;
+    callback done();
+    callback cancel();
+    out property <color> current: hsv(root.hue, root.sat, root.val);
+    width: 264px;
+    height: col.preferred-height;
+    TouchArea {} // swallow clicks on the card so the backdrop doesn't dismiss it
+    col := VerticalLayout {
+        padding: 16px; spacing: 14px;
+        // Saturation (x) × value (y) field, over the pure hue.
+        Rectangle {
+            height: 176px; border-radius: 8px; clip: true;
+            Rectangle { background: hsv(root.hue, 1, 1); }
+            Rectangle { background: @linear-gradient(90deg, #ffffffff 0%, #ffffff00 100%); }
+            Rectangle { background: @linear-gradient(180deg, #00000000 0%, #000000ff 100%); }
+            sv := TouchArea {
+                clicked => { root.sat = clamp(self.mouse-x / self.width, 0, 1); root.val = clamp(1 - self.mouse-y / self.height, 0, 1); }
+                moved => { if (self.pressed) { root.sat = clamp(self.mouse-x / self.width, 0, 1); root.val = clamp(1 - self.mouse-y / self.height, 0, 1); } }
+            }
+            Rectangle {
+                width: 14px; height: 14px; border-radius: 7px;
+                border-width: 2px; border-color: white;
+                x: root.sat * parent.width - self.width / 2;
+                y: (1 - root.val) * parent.height - self.height / 2;
+            }
+        }
+        // Hue strip.
+        Rectangle {
+            height: 14px; border-radius: 7px; clip: true;
+            background: @linear-gradient(90deg, #ff0000 0%, #ffff00 16.66%, #00ff00 33.33%, #00ffff 50%, #0000ff 66.66%, #ff00ff 83.33%, #ff0000 100%);
+            hue-ta := TouchArea {
+                clicked => { root.hue = clamp(self.mouse-x / self.width * 360, 0, 360); }
+                moved => { if (self.pressed) { root.hue = clamp(self.mouse-x / self.width * 360, 0, 360); } }
+            }
+            Rectangle {
+                width: 6px; height: parent.height; border-radius: 3px;
+                background: white; border-width: 1px; border-color: #00000080;
+                x: root.hue / 360 * (parent.width - self.width);
+            }
+        }
+        // Preview + RGB readout.
+        HorizontalLayout {
+            spacing: 10px;
+            Rectangle { width: 46px; height: 28px; border-radius: 6px; background: root.current; border-width: 1px; border-color: #ffffff59; }
+            Text {
+                text: "RGB  \{round(root.current.red)}, \{round(root.current.green)}, \{round(root.current.blue)}";
+                color: #ffffffe6; font-size: 13px; vertical-alignment: center; horizontal-stretch: 1;
+            }
+        }
+        // Actions.
+        HorizontalLayout {
+            spacing: 8px;
+            Rectangle { horizontal-stretch: 1; }
+            cancel-ta := TouchArea {
+                width: 76px; height: 30px;
+                clicked => { root.cancel(); }
+                Rectangle {
+                    background: cancel-ta.has-hover ? Theme.hover-strong : Theme.hover;
+                    border-radius: Theme.radius-sm;
+                    Text { text: @tr("Cancel"); color: #ffffffe6; font-size: 13px; horizontal-alignment: center; vertical-alignment: center; }
+                }
+            }
+            done-ta := TouchArea {
+                width: 76px; height: 30px;
+                clicked => { root.done(); }
+                Rectangle {
+                    background: Theme.accent;
+                    border-radius: Theme.radius-sm;
+                    Text { text: @tr("Done"); color: Theme.on-accent; font-size: 13px; font-weight: 600; horizontal-alignment: center; vertical-alignment: center; }
+                }
+            }
+        }
+    }
+}
+
+// One item in the Settings left rail.
+export component RailItem {
+    in property <string> icon;
+    in property <string> label;
+    in property <bool> selected;
+    callback clicked;
+    height: 40px;
+    ta := TouchArea { clicked => { root.clicked(); } }
+    Rectangle {
+        background: root.selected ? #ffffff0d : (ta.has-hover ? #ffffff14 : transparent);
+        border-radius: Theme.radius-sm;
+        HorizontalLayout {
+            padding-left: 12px; padding-right: 8px; spacing: 12px;
+            VerticalLayout { alignment: center; AppIcon { data: root.icon; size: 20px; color: root.selected ? Theme.accent : #ffffffb3; } }
+            Text { text: root.label; color: root.selected ? Theme.accent : #ffffffb3; font-size: 13px; vertical-alignment: center; horizontal-stretch: 1; overflow: elide; }
+        }
+    }
+}

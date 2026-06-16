@@ -1,0 +1,445 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ko\n"
+
+msgid "Open File"
+msgstr "파일 열기"
+
+msgid "Open URL"
+msgstr "URL 열기"
+
+msgid "Pause"
+msgstr "일시정지"
+
+msgid "Play"
+msgstr "재생"
+
+msgid "Stop"
+msgstr "정지"
+
+msgid "Subtitles"
+msgstr "자막"
+
+msgid "Audio"
+msgstr "오디오"
+
+msgid "Speed"
+msgstr "속도"
+
+msgid "Chapters"
+msgstr "챕터"
+
+msgid "Aspect Ratio"
+msgstr "화면 비율"
+
+msgid "A-B Loop"
+msgstr "A-B 반복"
+
+msgid "Set A"
+msgstr "A 지점 설정"
+
+msgid "Set B"
+msgstr "B 지점 설정"
+
+msgid "Screenshot"
+msgstr "스크린샷"
+
+msgid "Screenshot saved"
+msgstr "스크린샷이 저장되었습니다"
+
+msgid "Media Info"
+msgstr "미디어 정보"
+
+msgid "Settings"
+msgstr "설정"
+
+msgid "Always on Top"
+msgstr "항상 위에"
+
+msgid "Sleep Timer"
+msgstr "취침 타이머"
+
+msgid "Cancel"
+msgstr "취소"
+
+msgid "Off"
+msgstr "끔"
+
+msgid "Auto"
+msgstr "자동"
+
+msgid "No subtitle tracks"
+msgstr "자막 트랙 없음"
+
+msgid "No audio tracks"
+msgstr "오디오 트랙 없음"
+
+msgid "Disable"
+msgstr "비활성화"
+
+msgid "Open local subtitle"
+msgstr "로컬 자막 열기"
+
+msgid "ON"
+msgstr "켬"
+
+msgid "Delay"
+msgstr "지연"
+
+msgid "Translate"
+msgstr "번역"
+
+msgid "Style"
+msgstr "스타일"
+
+msgid "Reset"
+msgstr "초기화"
+
+msgid "Font"
+msgstr "글꼴"
+
+msgid "Size"
+msgstr "크기"
+
+msgid "Text Color"
+msgstr "글자 색상"
+
+msgid "Border Color"
+msgstr "테두리 색상"
+
+msgid "Border Size"
+msgstr "테두리 크기"
+
+msgid "Position"
+msgstr "위치"
+
+msgid "Text"
+msgstr "글자"
+
+msgid "Bold"
+msgstr "??"
+
+msgid "Border"
+msgstr "테두리"
+
+msgid "Playlist"
+msgstr "재생목록"
+
+msgid "Empty playlist"
+msgstr "재생목록이 비어 있습니다"
+
+msgid "+ Files"
+msgstr "+ 파일"
+
+msgid "+ Folder"
+msgstr "+ 폴더"
+
+msgid "Clear"
+msgstr "비우기"
+
+msgid "Remove"
+msgstr "제거"
+
+msgid "Shuffle"
+msgstr "셔플"
+
+msgid "Repeat"
+msgstr "반복"
+
+msgid "items"
+msgstr "항목"
+
+msgid "Search online..."
+msgstr "온라인 검색..."
+
+msgid "Search Online"
+msgstr "온라인 검색"
+
+msgid "Search subtitle"
+msgstr "자막 검색"
+
+msgid "Searching..."
+msgstr "검색 중..."
+
+msgid "No results"
+msgstr "결과 없음"
+
+msgid "Download failed"
+msgstr "다운로드 실패"
+
+msgid "File"
+msgstr "파일"
+
+msgid "Resolution"
+msgstr "해상도"
+
+msgid "Video Codec"
+msgstr "비디오 코덱"
+
+msgid "Audio Codec"
+msgstr "오디오 코덱"
+
+msgid "FPS"
+msgstr "FPS"
+
+msgid "Video Bitrate"
+msgstr "비디오 비트레이트"
+
+msgid "Audio Bitrate"
+msgstr "오디오 비트레이트"
+
+msgid "Duration"
+msgstr "재생 시간"
+
+msgid "File Size"
+msgstr "파일 크기"
+
+msgid "General"
+msgstr "일반"
+
+msgid "Video"
+msgstr "영상"
+
+msgid "Language"
+msgstr "언어"
+
+msgid "Preferred Audio Language"
+msgstr "선호 오디오"
+
+msgid "Preferred Subtitle Language"
+msgstr "선호 자막"
+
+msgid "Deinterlace"
+msgstr "디인터레이스"
+
+msgid "Default Volume"
+msgstr "기본 음량"
+
+msgid "Default Speed"
+msgstr "기본 속도"
+
+msgid "Remember Position"
+msgstr "재생 위치 기억"
+
+msgid "Auto Play"
+msgstr "자동 재생"
+
+msgid "Remember Audio/Subtitle"
+msgstr "오디오/자막 기억"
+
+msgid "Subtitle Encoding"
+msgstr "자막 인코딩"
+
+msgid "Color"
+msgstr "색상"
+
+msgid "Brightness"
+msgstr "밝기"
+
+msgid "Contrast"
+msgstr "대비"
+
+msgid "Saturation"
+msgstr "채도"
+
+msgid "Zoom"
+msgstr "확대/축소"
+
+msgid "Normalization"
+msgstr "정규화"
+
+msgid "Volume Boost"
+msgstr "볼륨 부스트"
+
+msgid "Equalizer"
+msgstr "이퀄라이저"
+
+msgid "Apply Embedded Styles"
+msgstr "내장 스타일 적용"
+
+msgid "Restore Defaults"
+msgstr "기본값 복원"
+
+msgid "Previous"
+msgstr "이전"
+
+msgid "Next"
+msgstr "다음"
+
+msgid "Fullscreen"
+msgstr "전체 화면"
+
+msgid "Playback speed"
+msgstr "재생 속도"
+
+msgid "Menu"
+msgstr "메뉴"
+
+msgid "Minimize"
+msgstr "최소화"
+
+msgid "Maximize"
+msgstr "최대화"
+
+msgid "Close"
+msgstr "닫기"
+
+msgid "Play / Pause"
+msgstr "재생 / 일시정지"
+
+msgid "Seek Forward (5s)"
+msgstr "5초 앞으로"
+
+msgid "Seek Forward (30s)"
+msgstr "30초 앞으로"
+
+msgid "Seek Back (5s)"
+msgstr "5초 뒤로"
+
+msgid "Seek Back (30s)"
+msgstr "30초 뒤로"
+
+msgid "Frame Step"
+msgstr "다음 프레임"
+
+msgid "Frame Back"
+msgstr "이전 프레임"
+
+msgid "Speed Up"
+msgstr "속도 높이기"
+
+msgid "Speed Down"
+msgstr "속도 낮추기"
+
+msgid "Volume Up"
+msgstr "음량 높이기"
+
+msgid "Volume Down"
+msgstr "음량 낮추기"
+
+msgid "Mute"
+msgstr "음소거"
+
+msgid "Cycle Subtitles"
+msgstr "자막 전환"
+
+msgid "Cycle Audio"
+msgstr "오디오 전환"
+
+msgid "Shortcuts"
+msgstr "단축키"
+
+msgid "Playback"
+msgstr "재생"
+
+msgid "Volume"
+msgstr "음량"
+
+msgid "Tracks"
+msgstr "트랙"
+
+msgid "Navigation"
+msgstr "탐색"
+
+msgid "Reset All Shortcuts"
+msgstr "모든 단축키 초기화"
+
+msgid "Press a key..."
+msgstr "키를 누르세요..."
+
+msgid "Drop file to play"
+msgstr "파일을 놓아서 재생"
+
+msgid "Vayou"
+msgstr "Vayou"
+
+msgid "Drop a file here or press"
+msgstr "여기에 파일을 놓거나"
+
+msgid "to open"
+msgstr "눌러서 열기"
+
+msgid "OK"
+msgstr "좋아요"
+
+msgid "About"
+msgstr "에 대한"
+
+msgid "Interface"
+msgstr "인터페이스"
+
+msgid "Output"
+msgstr "산출"
+
+msgid "Flat"
+msgstr "평평한"
+
+msgid "Bass"
+msgstr "베이스"
+
+msgid "Treble"
+msgstr "고음부"
+
+msgid "Vocal"
+msgstr "보컬"
+
+msgid "Rock"
+msgstr "바위"
+
+msgid "Native video player"
+msgstr "네이티브 비디오 플레이어"
+
+msgid "Updates"
+msgstr "업데이트"
+
+msgid "Application updates"
+msgstr "애플리케이션 업데이트"
+
+msgid "Checking…"
+msgstr "확인 중…"
+
+msgid "You're on the latest version."
+msgstr "최신 버전을 사용 중입니다."
+
+msgid "Downloading and verifying…"
+msgstr "다운로드 및 확인 중…"
+
+msgid "Update installed — restart to apply."
+msgstr "업데이트가 설치되었습니다. 적용하려면 다시 시작하세요."
+
+msgid "Check whether a newer version is available."
+msgstr "최신 버전이 있는지 확인하세요."
+
+msgid "Open releases page"
+msgstr "릴리스 페이지 열기"
+
+msgid "Restart now"
+msgstr "지금 다시 시작"
+
+msgid "Install"
+msgstr "설치하다"
+
+msgid "Installing…"
+msgstr "설치 중…"
+
+msgid "Check for updates"
+msgstr "업데이트 확인"
+
+msgid "Restore defaults"
+msgstr "기본값 복원"
+
+msgid "Reset every setting to its default value."
+msgstr "모든 설정을 기본값으로 재설정합니다."
+
+msgid "Done"
+msgstr "완료"
+
+msgid "{} min"
+msgstr "{}분"
+
+msgid "Version {} is available."
+msgstr "버전 {}를 사용할 수 있습니다."
+
+msgid "Couldn't update: {}"
+msgstr "업데이트할 수 없음: {}"
