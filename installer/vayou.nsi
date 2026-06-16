@@ -1,19 +1,19 @@
-; Vayou — per-user installer (no admin, no UAC).
+; Vayou - per-user installer (no admin, no UAC).
 ;
 ; Build it with NSIS (https://nsis.sourceforge.io):
 ;   makensis vayou.nsi
 ; (or just run build.ps1 next to this file, which also signs the binary and
 ; emits latest.json for the in-app self-updater.)
 ;
-; Lives in installer/ inside the repo. The .nsi and build.ps1 are tracked; the
-; built Vayou-Setup.exe / vayou.exe.minisig / latest.json are git-ignored.
+; Lives in installer/ inside the repo. The .nsi, build.ps1 and branding art are
+; tracked; the built Vayou-Setup.exe / vayou.exe.minisig / latest.json are git-ignored.
 ;
 ; No runtime bootstrapper: the Slint app is a single native exe. The payload is
-; vayou.exe + the two sidecars it loads at runtime — libmpv-2.dll (video engine)
+; vayou.exe + the two sidecars it loads at runtime - libmpv-2.dll (video engine)
 ; and ffmpeg.exe (subtitle extraction / translation). Translations, icons and
 ; the per-format file-type icons are compiled into the binary; the app registers
 ; its file associations itself on first run (src/file_assoc.rs), so the
-; installer doesn't touch them — only the uninstaller cleans them up.
+; installer doesn't touch them - only the uninstaller cleans them up.
 
 Unicode true
 ; Without this the installer is bitmap-stretched on high-DPI screens (blurry
@@ -22,7 +22,7 @@ ManifestDPIAware true
 
 !define APP_NAME    "Vayou"
 !define APP_EXE     "vayou.exe"
-; Version is normally passed by build.ps1 (/DAPP_VERSION=… /DAPP_VERSION_4=…),
+; Version is normally passed by build.ps1 (/DAPP_VERSION=... /DAPP_VERSION_4=...),
 ; read from Cargo.toml so it stays the single source of truth. These defaults
 ; apply only when makensis is run directly.
 !ifndef APP_VERSION
@@ -58,6 +58,14 @@ BrandingText "Copyright (c) 2026 ${PUBLISHER}"
 
 !define MUI_ICON   "${ASSETS}\icon.ico"
 !define MUI_UNICON "${ASSETS}\icon.ico"
+; Custom chrome - replaces the default blue NSIS background: a header strip with
+; the logo on the inner pages and a branded sidebar on the Welcome/Finish pages,
+; for both the installer and the uninstaller.
+!define MUI_HEADERIMAGE
+!define MUI_HEADERIMAGE_BITMAP         "${HERE}\installer-header.bmp"
+!define MUI_HEADERIMAGE_UNBITMAP       "${HERE}\installer-header.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP   "${HERE}\installer-sidebar.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "${HERE}\installer-sidebar.bmp"
 !define MUI_FINISHPAGE_RUN "$INSTDIR\${APP_EXE}"
 !define MUI_FINISHPAGE_RUN_TEXT "Launch Vayou"
 
@@ -167,7 +175,7 @@ Section "Uninstall"
   !insertmacro UnregExt "wma"
   !insertmacro UnregExt "m4a"
   !insertmacro UnregExt "opus"
-  ; The generated file-type icon cache (config.json next to it is user data — kept).
+  ; The generated file-type icon cache (config.json next to it is user data - kept).
   RMDir /r "$LOCALAPPDATA\Vayou\fileicons"
 
   ; Tell the shell associations changed so Explorer refreshes icons / "Open with".

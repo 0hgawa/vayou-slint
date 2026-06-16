@@ -96,24 +96,13 @@ export component SubtitlePanel inherits SidePanel {
             SettingToggleRow { icon: Ic.format-bold; title: @tr("Bold"); on: PlayerState.sub-bold; toggled => { PlayerState.sub-bold = !PlayerState.sub-bold; root.apply-sub-style(); } }
             SettingSliderRow { icon: Ic.format-size; title: @tr("Size"); value: "\{PlayerState.sub-size}"; svalue: PlayerState.sub-size; minimum: 10; maximum: 100; changed(v) => { PlayerState.sub-size = round(v); root.apply-sub-style(); } }
             HorizontalLayout {
-                padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap; height: 50px;
-                VerticalLayout { alignment: center; AppIcon { data: Ic.format-color-text; size: 20px; color: #ffffff8c; } }
-                VerticalLayout {
-                    alignment: center; spacing: 2px; horizontal-stretch: 1;
-                    Text { text: @tr("Text Color"); color: #ffffffe6; font-size: 13px; }
-                    Text { text: PlayerState.sub-color-hex; color: #ffffff73; font-size: 11px; }
-                }
+                padding-left: Theme.pad; padding-right: Theme.pad; spacing: 8px; height: 50px;
+                VerticalLayout { alignment: center; Text { text: @tr("Text"); color: #ffffffe6; font-size: 13px; } }
                 VerticalLayout { alignment: center; Rectangle { width: 44px; height: 24px; border-radius: 4px; background: PlayerState.sub-color; border-width: 1px; border-color: #ffffff59; TouchArea { clicked => { root.pick-color("text"); } } } }
-            }
-            HorizontalLayout {
-                padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap; height: 50px;
-                VerticalLayout { alignment: center; AppIcon { data: Ic.palette; size: 20px; color: #ffffff8c; } }
-                VerticalLayout {
-                    alignment: center; spacing: 2px; horizontal-stretch: 1;
-                    Text { text: @tr("Border Color"); color: #ffffffe6; font-size: 13px; }
-                    Text { text: PlayerState.sub-border-color-hex; color: #ffffff73; font-size: 11px; }
-                }
+                Rectangle { width: 24px; }
+                VerticalLayout { alignment: center; Text { text: @tr("Border"); color: #ffffffe6; font-size: 13px; } }
                 VerticalLayout { alignment: center; Rectangle { width: 44px; height: 24px; border-radius: 4px; background: PlayerState.sub-border-color; border-width: 1px; border-color: #ffffff59; TouchArea { clicked => { root.pick-color("border"); } } } }
+                Rectangle { horizontal-stretch: 1; }
             }
             SettingSliderRow { icon: Ic.line-weight; title: @tr("Border Size"); value: "\{PlayerState.sub-border-size}"; svalue: PlayerState.sub-border-size; minimum: 0; maximum: 10; changed(v) => { PlayerState.sub-border-size = round(v); root.apply-sub-style(); } }
             SettingSliderRow { icon: Ic.align-bottom; title: @tr("Position"); value: "\{PlayerState.sub-position}%"; svalue: PlayerState.sub-position; minimum: 0; maximum: 100; changed(v) => { PlayerState.sub-position = round(v); root.apply-sub-style(); } }

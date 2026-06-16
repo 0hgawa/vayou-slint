@@ -4,7 +4,7 @@
 #   powershell -ExecutionPolicy Bypass -File build.ps1
 #
 # The self-updater downloads and swaps ONLY vayou.exe (verified against the
-# minisign key embedded in the app — src/update.rs UPDATE_PUBKEY). The NSIS
+# minisign key embedded in the app - src/update.rs UPDATE_PUBKEY). The NSIS
 # installer is just for the first install (ships vayou.exe + libmpv-2.dll +
 # ffmpeg.exe + shortcuts).
 #
@@ -28,11 +28,11 @@ Write-Host "Building release..."
 if ($LASTEXITCODE -ne 0) { throw "cargo build failed ($LASTEXITCODE)" }
 if (-not (Test-Path $exe)) { throw "vayou.exe not found after build." }
 
-# The installer bundles the two runtime sidecars — fail early if they're missing
+# The installer bundles the two runtime sidecars - fail early if they're missing
 # from the release dir (they're not committed; drop them in per the README).
 foreach ($dep in @("libmpv-2.dll", "ffmpeg.exe")) {
     if (-not (Test-Path "$root\target\release\$dep")) {
-        throw "$dep is missing from target\release — copy it there before packaging."
+        throw "$dep is missing from target\release - copy it there before packaging."
     }
 }
 
@@ -66,7 +66,7 @@ $setup = Join-Path $PSScriptRoot "Vayou-Setup.exe"
 if ($LASTEXITCODE -ne 0) { throw "makensis failed ($LASTEXITCODE)" }
 if (-not (Test-Path $setup)) { throw "Vayou-Setup.exe was not produced." }
 
-# 2. Sign vayou.exe (rsign2) — this is what the self-updater verifies.
+# 2. Sign vayou.exe (rsign2) - this is what the self-updater verifies.
 $rsign = (Get-Command rsign -ErrorAction SilentlyContinue).Source
 if (-not $rsign) {
     throw "rsign not found on PATH. Install it: 'cargo install rsign2'."
