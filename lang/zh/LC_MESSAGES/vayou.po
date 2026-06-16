@@ -387,8 +387,8 @@ msgstr "声乐"
 msgid "Rock"
 msgstr "岩石"
 
-msgid "Native video player"
-msgstr "原生视频播放器"
+msgid "Video player"
+msgstr "视频播放器"
 
 msgid "Updates"
 msgstr "更新"

@@ -1,4 +1,4 @@
-// Vayou Native — libmpv video player in Slint.
+// Vayou — libmpv video player in Slint.
 //
 // A single frameless Slint window. mpv renders the video (subtitles included)
 // into the window's OpenGL framebuffer UNDER the UI via Slint's rendering

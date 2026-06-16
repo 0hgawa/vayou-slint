@@ -112,7 +112,7 @@ export component VolumeControl {
     height: 36px;
     property <bool> hovered: mute-ta.has-hover || track-ta.has-hover;
     property <float> frac: root.maximum > 0 ? (root.muted ? 0 : root.volume) / root.maximum : 0;
-    width: root.hovered ? 112px : 36px;
+    width: root.hovered ? 128px : 36px;
     animate width { duration: 160ms; easing: ease-in-out; }
     Rectangle {
         background: root.hovered ? #ffffff1f : transparent;
@@ -120,6 +120,10 @@ export component VolumeControl {
         clip: true;
         HorizontalLayout {
             spacing: 0px;
+            // Right inset so the slider/thumb sit inside the rounded pill
+            // instead of being glued to its right edge (mirrors the mute
+            // button's visual margin on the left).
+            padding-right: 14px;
             // Mute toggle
             Rectangle {
                 width: 36px;

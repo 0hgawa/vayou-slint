@@ -387,8 +387,8 @@ msgstr "صوتي"
 msgid "Rock"
 msgstr "صخر"
 
-msgid "Native video player"
-msgstr "مشغل فيديو أصلي"
+msgid "Video player"
+msgstr "مشغل فيديو"
 
 msgid "Updates"
 msgstr "التحديثات"

@@ -387,8 +387,8 @@ msgstr "स्वर"
 msgid "Rock"
 msgstr "चट्टान"
 
-msgid "Native video player"
-msgstr "देशी वीडियो प्लेयर"
+msgid "Video player"
+msgstr "वीडियो प्लेयर"
 
 msgid "Updates"
 msgstr "अपडेट"

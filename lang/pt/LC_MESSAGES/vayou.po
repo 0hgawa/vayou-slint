@@ -369,8 +369,8 @@ msgstr "Interface"
 msgid "Output"
 msgstr "Saída"
 
-msgid "Native video player"
-msgstr "Reprodutor de vídeo nativo"
+msgid "Video player"
+msgstr "Reprodutor de vídeo"
 
 msgid "Updates"
 msgstr "Atualizações"

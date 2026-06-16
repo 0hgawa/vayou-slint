@@ -387,8 +387,8 @@ msgstr "Вокал"
 msgid "Rock"
 msgstr "Камень"
 
-msgid "Native video player"
-msgstr "Родной видеоплеер"
+msgid "Video player"
+msgstr "Видеоплеер"
 
 msgid "Updates"
 msgstr "Обновления"

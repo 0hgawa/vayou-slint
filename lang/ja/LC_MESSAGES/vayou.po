@@ -387,8 +387,8 @@ msgstr "ボーカル"
 msgid "Rock"
 msgstr "ロック"
 
-msgid "Native video player"
-msgstr "ネイティブビデオプレーヤー"
+msgid "Video player"
+msgstr "ビデオプレーヤー"
 
 msgid "Updates"
 msgstr "アップデート"

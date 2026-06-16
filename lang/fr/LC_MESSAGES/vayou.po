@@ -387,8 +387,8 @@ msgstr "Vocal"
 msgid "Rock"
 msgstr "Rocher"
 
-msgid "Native video player"
-msgstr "Lecteur vidéo natif"
+msgid "Video player"
+msgstr "Lecteur vidéo"
 
 msgid "Updates"
 msgstr "Mises à jour"

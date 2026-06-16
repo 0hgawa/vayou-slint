@@ -387,8 +387,8 @@ msgstr "Gesang"
 msgid "Rock"
 msgstr "Felsen"
 
-msgid "Native video player"
-msgstr "Nativer Videoplayer"
+msgid "Video player"
+msgstr "Videoplayer"
 
 msgid "Updates"
 msgstr "Aktualisierungen"

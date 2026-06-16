@@ -387,8 +387,8 @@ msgstr "보컬"
 msgid "Rock"
 msgstr "바위"
 
-msgid "Native video player"
-msgstr "네이티브 비디오 플레이어"
+msgid "Video player"
+msgstr "비디오 플레이어"
 
 msgid "Updates"
 msgstr "업데이트"

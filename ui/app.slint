@@ -278,6 +278,20 @@ export component MainWindow inherits Window {
         triggered => { root.toast = ""; }
     }
 
+    // Volume OSD: briefly show the current level on the video whenever it
+    // changes, so tweaks via the keyboard/scroll are visible even with the
+    // controls hidden in fullscreen. Mirrors the idle-ticks pattern — each
+    // change resets the countdown, so holding a key keeps it on screen.
+    property <int> vol-osd-ticks: 100;
+    property <bool> vol-osd-show: root.has-file && root.vol-osd-ticks < 8;
+    changed volume => { root.vol-osd-ticks = 0; }
+    changed muted => { root.vol-osd-ticks = 0; }
+    vol-osd-timer := Timer {
+        interval: 150ms;
+        running: root.vol-osd-ticks < 8;
+        triggered => { root.vol-osd-ticks += 1; }
+    }
+
     forward-focus: keyfocus;
     keyfocus := FocusScope {
         key-pressed(e) => {
@@ -553,6 +567,44 @@ export component MainWindow inherits Window {
             HorizontalLayout {
                 padding-left: 16px; padding-right: 16px;
                 Text { text: root.toast; color: #ffffffe6; font-size: 12px; vertical-alignment: center; }
+            }
+        }
+    }
+
+    // --- Volume OSD (transient): a minimal icon + percentage pill, top-center.
+    // No progress bar — just the level. The percentage has a fixed width so the
+    // pill never jitters as digits change while holding the key.
+    if root.vol-osd-show: Rectangle {
+        x: (root.width - self.width) / 2;
+        y: 44px;
+        height: 38px;
+        width: vol-osd-row.preferred-width;
+        background: #000000b3;
+        border-radius: self.height / 2;
+        border-width: 1px;
+        border-color: #ffffff1f;
+        vol-osd-row := HorizontalLayout {
+            padding-left: 15px;
+            padding-right: 17px;
+            spacing: 8px;
+            VerticalLayout {
+                alignment: center;
+                AppIcon {
+                    data: (root.muted || root.volume == 0) ? Ic.volume-off : Ic.volume-on;
+                    size: 19px;
+                    color: #ffffffe6;
+                }
+            }
+            VerticalLayout {
+                alignment: center;
+                Text {
+                    text: root.muted ? "0%" : "\{round(root.volume)}%";
+                    color: #ffffffe6;
+                    font-size: 15px;
+                    font-weight: 600;
+                    width: 42px;
+                    horizontal-alignment: center;
+                }
             }
         }
     }
