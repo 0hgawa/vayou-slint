@@ -1,5 +1,5 @@
 import { Ic } from "icons.slint";
-import { MenuItem, MenuSep, MenuSurface } from "widgets.slint";
+import { MenuItem, MenuSep, MenuSurface, VScroll } from "widgets.slint";
 import { PlayerState, RatioRow, Catalog } from "state.slint";
 
 // The right-click / hamburger context menu. Reads/writes shared state through
@@ -34,15 +34,26 @@ export component ContextMenu inherits Rectangle {
     }
     card := MenuSurface {
         width: 224px;
-        height: menucol.preferred-height;
+        // Never taller than the window — scroll the body when the menu doesn't fit.
+        height: min(pinned.preferred-height + menucol.preferred-height, root.height - 16px);
         x: clamp(PlayerState.ctx-x, 8px, root.width - self.width - 8px);
         y: (PlayerState.ctx-y + self.height > root.height - 8px) ? max(8px, PlayerState.ctx-y - self.height) : min(PlayerState.ctx-y, root.height - self.height - 8px);
-        menucol := VerticalLayout {
-            padding-top: 6px; padding-bottom: 6px;
+        VerticalLayout {
+        // Pinned actions: on the main page the Open items stay put while the rest
+        // of the menu scrolls beneath them. Zero-height on sub-pages.
+        pinned := VerticalLayout {
             if PlayerState.ctx-page == "main": VerticalLayout {
+                padding-top: 8px;
                 MenuItem { icon: Ic.folder-open; label: @tr("Open File"); key-hint: "Ctrl+O"; clicked => { root.open-file(); PlayerState.ctx-show = false; } }
                 MenuItem { icon: Ic.link; label: @tr("Open URL"); key-hint: "Ctrl+U"; clicked => { root.open-url(); PlayerState.ctx-show = false; } }
                 MenuSep {}
+            }
+        }
+        VScroll {
+        vertical-stretch: 1;
+        menucol := VerticalLayout {
+            padding-top: PlayerState.ctx-page == "main" ? 0px : 8px; padding-bottom: 8px;
+            if PlayerState.ctx-page == "main": VerticalLayout {
                 if PlayerState.ctx-sub-tracks.length > 0: MenuItem { icon: Ic.subtitles; label: @tr("Subtitles"); arrow: true; clicked => { PlayerState.ctx-page = "sub"; } }
                 if PlayerState.ctx-audio-tracks.length > 0: MenuItem { icon: Ic.audio; label: @tr("Audio"); arrow: true; clicked => { PlayerState.ctx-page = "audio"; } }
                 MenuItem { icon: Ic.speed; label: @tr("Speed") + " (\{PlayerState.speed}x)"; arrow: true; clicked => { PlayerState.ctx-page = "speed"; } }
@@ -101,6 +112,8 @@ export component ContextMenu inherits Rectangle {
                 if PlayerState.sleep-remaining != "": MenuItem { icon: Ic.close-x; label: @tr("Cancel"); value-hint: PlayerState.sleep-remaining; clicked => { root.cancel-sleep(); PlayerState.ctx-show = false; } }
                 for m in root.sleep-options: MenuItem { show-check: true; checked: PlayerState.sleep-min == m; active: PlayerState.sleep-min == m; label: @tr("{} min", m); clicked => { root.set-sleep(m); PlayerState.ctx-show = false; } }
             }
+        }
+        }
         }
     }
 }

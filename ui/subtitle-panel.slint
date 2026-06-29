@@ -1,8 +1,33 @@
 import { ScrollView } from "std-widgets.slint";
 import { Theme } from "theme.slint";
 import { Ic, AppIcon } from "icons.slint";
-import { CtrlButton, MenuItem, MenuSep, SidePanel, Stepper, SettingNavRow, SettingToggleRow, SettingSliderRow, TextButton, VScroll } from "widgets.slint";
+import { CtrlButton, MenuItem, MenuSep, SidePanel, Stepper, SettingNavRow, SettingToggleRow, SettingSliderRow, TextButton, VScroll, RowHover } from "widgets.slint";
 import { PlayerState, NamedLang, Catalog } from "state.slint";
+
+// The red translate-error banner. The backend reports a short, stable code
+// (see translate_job::run); we map it to a localized message here, with a × to
+// dismiss (a timer in app.slint also auto-dismisses it). An unknown code — e.g.
+// a raw ffmpeg/extract error — is shown verbatim.
+component TrErrorBanner inherits Rectangle {
+    background: #ff6b6b1a;
+    HorizontalLayout {
+        padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 8px; padding-bottom: 8px; spacing: 8px;
+        Text {
+            horizontal-stretch: 1; vertical-alignment: center;
+            color: #ff9a9a; font-size: 11px; wrap: word-wrap;
+            text: PlayerState.tr-error == "no-file" ? @tr("No file is playing.")
+                : PlayerState.tr-error == "no-track" ? @tr("No subtitle track selected.")
+                : PlayerState.tr-error == "no-entries" ? @tr("No subtitle text found to translate.")
+                : PlayerState.tr-error == "image-based" ? @tr("These subtitles are image-based and can't be translated.")
+                : PlayerState.tr-error == "rate-limited" ? @tr("Translation failed — the service is busy. Try again in a moment.")
+                : PlayerState.tr-error;
+        }
+        VerticalLayout {
+            alignment: center;
+            CtrlButton { width: 20px; height: 20px; icon-size: 12px; icon: Ic.close-x; clicked => { PlayerState.tr-error = ""; } }
+        }
+    }
+}
 
 // The multi-page subtitle side panel (tracks · style · online search · translate).
 // State lives in PlayerState; the actions are declared here and forwarded to the
@@ -46,7 +71,7 @@ export component SubtitlePanel inherits SidePanel {
     if PlayerState.sub-page != "main": VerticalLayout {
         HorizontalLayout {
             height: 30px; padding-left: 8px; padding-right: 8px;
-            VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 16px; icon: Ic.arrow-back; square-hover: true; clicked => { PlayerState.sub-page = (PlayerState.sub-page == "searchLang") ? "search" : (PlayerState.sub-page == "subfont" ? "style" : "main"); } } }
+            VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 16px; icon: Ic.arrow-back; clicked => { PlayerState.sub-page = (PlayerState.sub-page == "searchLang") ? "search" : (PlayerState.sub-page == "subfont" ? "style" : "main"); } } }
             Rectangle {}
             if PlayerState.sub-page == "style": VerticalLayout { alignment: center; TextButton { text: @tr("Reset"); font-size: 12px; confirm-on-click: true; clicked => { root.reset-sub-style(); } } }
         }
@@ -74,13 +99,7 @@ export component SubtitlePanel inherits SidePanel {
                 MenuSep {}
             }
         }
-        if PlayerState.tr-error != "": Rectangle {
-            background: #ff6b6b1a;
-            HorizontalLayout {
-                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 8px; padding-bottom: 8px;
-                Text { text: PlayerState.tr-error; color: #ff9a9a; font-size: 11px; wrap: word-wrap; horizontal-stretch: 1; }
-            }
-        }
+        if PlayerState.tr-error != "": TrErrorBanner {}
         Stepper {
             label: @tr("Delay"); value: "\{round(PlayerState.sub-delay * 10) / 10}s";
             active: PlayerState.sub-delay != 0;
@@ -123,13 +142,7 @@ export component SubtitlePanel inherits SidePanel {
             Rectangle {}
             Text { text: "\{PlayerState.tr-total > 0 ? round(PlayerState.tr-progress / PlayerState.tr-total * 100) : 0}%"; color: #ffffff80; font-size: 11px; vertical-alignment: center; }
         }
-        if PlayerState.tr-error != "": Rectangle {
-            background: #ff6b6b1a;
-            HorizontalLayout {
-                padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 8px; padding-bottom: 8px;
-                Text { text: PlayerState.tr-error; color: #ff9a9a; font-size: 11px; wrap: word-wrap; horizontal-stretch: 1; }
-            }
-        }
+        if PlayerState.tr-error != "": TrErrorBanner {}
         ScrollView {
             height: min(trlist.preferred-height, 300px);
             trlist := VerticalLayout {
@@ -165,7 +178,7 @@ export component SubtitlePanel inherits SidePanel {
                         clicked => { root.do-search(); }
                         Rectangle {
                             background: searchbtn.has-hover ? #ffffff2e : transparent;
-                            border-radius: Theme.radius-sm;
+                            border-radius: self.height / 2;
                             AppIcon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; data: Ic.search; size: 14px; color: white; }
                         }
                     }
@@ -181,7 +194,7 @@ export component SubtitlePanel inherits SidePanel {
                 for r[i] in PlayerState.search-results: Rectangle {
                     height: rrow.preferred-height + 10px;
                     ra := TouchArea { clicked => { if (PlayerState.downloading-index < 0) { root.download-sub(i); } } }
-                    background: ra.has-hover ? #ffffff14 : transparent;
+                    RowHover { fill: ra.has-hover ? Theme.hover : transparent; }
                     rrow := HorizontalLayout {
                         padding: 6px; spacing: 8px;
                         Text { text: r.lang; color: Theme.accent; font-size: 11px; font-weight: 600; letter-spacing: 0.6px; width: 28px; }

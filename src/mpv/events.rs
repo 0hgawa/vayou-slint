@@ -154,7 +154,7 @@ fn read_property_change(evt: &MpvEvent) -> Option<PlayerEvent> {
             ("duration", MPV_FORMAT_DOUBLE) => Some(PlayerEvent::Duration(*(prop.data as *const f64))),
             ("pause", MPV_FORMAT_FLAG) => Some(PlayerEvent::Pause(*(prop.data as *const i32) != 0)),
             ("volume", MPV_FORMAT_DOUBLE) => Some(PlayerEvent::Volume(*(prop.data as *const f64))),
-            ("media-title", MPV_FORMAT_STRING) => {
+            ("filename", MPV_FORMAT_STRING) => {
                 let ptr = *(prop.data as *const *const c_char);
                 if ptr.is_null() {
                     return None;

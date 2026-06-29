@@ -443,3 +443,18 @@ msgstr "버전 {}를 사용할 수 있습니다."
 
 msgid "Couldn't update: {}"
 msgstr "업데이트할 수 없음: {}"
+
+msgid "No file is playing."
+msgstr "재생 중인 파일이 없습니다."
+
+msgid "No subtitle track selected."
+msgstr "선택된 자막 트랙이 없습니다."
+
+msgid "No subtitle text found to translate."
+msgstr "번역할 자막 텍스트가 없습니다."
+
+msgid "These subtitles are image-based and can't be translated."
+msgstr "이 자막은 이미지 기반이므로 번역할 수 없습니다."
+
+msgid "Translation failed — the service is busy. Try again in a moment."
+msgstr "번역 실패 - 서비스가 사용 중입니다. 잠시 후에 다시 시도해 보세요."

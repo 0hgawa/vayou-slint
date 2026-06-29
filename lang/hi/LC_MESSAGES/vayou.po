@@ -443,3 +443,18 @@ msgstr "संस्करण {} उपलब्ध है."
 
 msgid "Couldn't update: {}"
 msgstr "अपडेट नहीं किया जा सका: {}"
+
+msgid "No file is playing."
+msgstr "कोई फ़ाइल नहीं चल रही है."
+
+msgid "No subtitle track selected."
+msgstr "कोई उपशीर्षक ट्रैक चयनित नहीं."
+
+msgid "No subtitle text found to translate."
+msgstr "अनुवाद करने के लिए कोई उपशीर्षक पाठ नहीं मिला."
+
+msgid "These subtitles are image-based and can't be translated."
+msgstr "ये उपशीर्षक छवि-आधारित हैं और इनका अनुवाद नहीं किया जा सकता।"
+
+msgid "Translation failed — the service is busy. Try again in a moment."
+msgstr "अनुवाद विफल - सेवा व्यस्त है। थोड़ी देर में पुनः प्रयास करें."

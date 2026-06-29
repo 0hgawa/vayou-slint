@@ -443,3 +443,18 @@ msgstr "Доступна версия {}."
 
 msgid "Couldn't update: {}"
 msgstr "Не удалось обновить: {}"
+
+msgid "No file is playing."
+msgstr "Ни один файл не воспроизводится."
+
+msgid "No subtitle track selected."
+msgstr "Не выбрана дорожка субтитров."
+
+msgid "No subtitle text found to translate."
+msgstr "Не найден текст субтитров для перевода."
+
+msgid "These subtitles are image-based and can't be translated."
+msgstr "Эти субтитры основаны на изображениях и не подлежат переводу."
+
+msgid "Translation failed — the service is busy. Try again in a moment."
+msgstr "Перевод не выполнен — сервис занят. Повторите попытку через минуту."

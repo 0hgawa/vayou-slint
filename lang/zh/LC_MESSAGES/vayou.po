@@ -443,3 +443,18 @@ msgstr "版本 {} 可用。"
 
 msgid "Couldn't update: {}"
 msgstr "无法更新：{}"
+
+msgid "No file is playing."
+msgstr "没有文件正在播放。"
+
+msgid "No subtitle track selected."
+msgstr "未选择字幕轨道。"
+
+msgid "No subtitle text found to translate."
+msgstr "找不到要翻译的字幕文本。"
+
+msgid "These subtitles are image-based and can't be translated."
+msgstr "这些字幕是基于图像的，无法翻译。"
+
+msgid "Translation failed — the service is busy. Try again in a moment."
+msgstr "翻译失败 — 服务正忙。稍后再试一次。"

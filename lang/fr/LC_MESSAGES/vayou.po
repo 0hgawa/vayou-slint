@@ -443,3 +443,18 @@ msgstr "La version {} est disponible."
 
 msgid "Couldn't update: {}"
 msgstr "Impossible de mettre à jour : {}"
+
+msgid "No file is playing."
+msgstr "Aucun fichier n'est en cours de lecture."
+
+msgid "No subtitle track selected."
+msgstr "Aucune piste de sous-titres sélectionnée."
+
+msgid "No subtitle text found to translate."
+msgstr "Aucun texte de sous-titre à traduire trouvé."
+
+msgid "These subtitles are image-based and can't be translated."
+msgstr "Ces sous-titres sont basés sur des images et ne peuvent pas être traduits."
+
+msgid "Translation failed — the service is busy. Try again in a moment."
+msgstr "Échec de la traduction : le service est occupé. Réessayez dans un instant."

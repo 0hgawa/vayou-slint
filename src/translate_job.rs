@@ -76,6 +76,12 @@ pub fn is_translatable_source(mpv: &MpvPlayer, id: i64) -> bool {
 
 /// Translate the selected subtitle into `target_lang`, adding it to mpv. Calls
 /// `progress(current, total, done)` as chunks complete.
+///
+/// On failure returns a short, stable error code (`no-file`, `no-track`,
+/// `image-based`, `no-entries`, `rate-limited`) that the UI maps to a localized
+/// message (see `TrErrorBanner` in `ui/subtitle-panel.slint`); an empty code
+/// means "fail silently, show no banner". Errors bubbled up from the extract /
+/// write helpers stay as their raw text and fall through to the banner verbatim.
 pub async fn run<F>(mpv: Arc<MpvPlayer>, target_lang: String, progress: F) -> Result<String, String>
 where
     F: Fn(usize, usize, bool) + Send + Sync + 'static,
@@ -90,7 +96,7 @@ where
     // the previous episode's subs).
     let video_path = mpv.get_property_string("path").ok()
         .filter(|p| !p.is_empty())
-        .ok_or("No file playing")?;
+        .ok_or("no-file")?;
 
     let tracks = TracksService::get_all(&mpv);
     let sub_track = tracks.iter()
@@ -100,10 +106,10 @@ where
             mpv.set::<&str>("sid", &sid.to_string()).ok();
             tracks.iter().find(|t| t.track_type == "sub" && t.id == sid)
         })
-        .ok_or("No subtitle track selected")?;
+        .ok_or("no-track")?;
 
     if UNSUPPORTED_CODECS.contains(&sub_track.codec.as_str()) {
-        return Err(format!("'{}' subtitles are image-based and cannot be translated", sub_track.codec));
+        return Err("image-based".into());
     }
 
     let source_sid = sub_track.id;
@@ -133,7 +139,7 @@ where
     }?;
 
     if entries.is_empty() {
-        return Err("No subtitle entries found".into());
+        return Err("no-entries".into());
     }
     info!(entry_count = entries.len(), "translate: entries extracted");
 
@@ -176,11 +182,12 @@ where
         }
     }
     if failed_chunks == total {
-        return Err("Translation failed: all chunks were rate-limited or rejected by the upstream service".into());
+        return Err("rate-limited".into());
     }
 
     if current_run_id().load(Ordering::SeqCst) != my_run {
-        return Err("Superseded by a newer translation".into());
+        // Superseded by a newer run — fail silently (empty code shows no banner).
+        return Err(String::new());
     }
 
     if let Some(header) = ass_header {

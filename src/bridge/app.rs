@@ -39,7 +39,9 @@ pub(crate) fn spawn_mpv(weak: slint::Weak<MainWindow>, mpv_state: Arc<MpvState>,
         let _ = mpv.observe_property("duration", 2, MPV_FORMAT_DOUBLE);
         let _ = mpv.observe_property("pause", 3, MPV_FORMAT_FLAG);
         let _ = mpv.observe_property("volume", 4, MPV_FORMAT_DOUBLE);
-        let _ = mpv.observe_property("media-title", 5, MPV_FORMAT_STRING);
+        // Title bar shows the file name, not the embedded metadata title —
+        // many files have no title or set a short/unrelated one.
+        let _ = mpv.observe_property("filename", 5, MPV_FORMAT_STRING);
 
         if let Ok((alang, slang, vol_boost, embedded_styles, sub_codepage, volume, speed)) = app_state.with(|s, _| {
             (s.preferred_audio_lang.clone(), s.preferred_subtitle_lang.clone(), s.volume_boost, s.apply_embedded_styles, s.subtitle_encoding.clone(), s.volume, s.speed)

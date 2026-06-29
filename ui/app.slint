@@ -1,7 +1,7 @@
 import { ScrollView } from "std-widgets.slint";
 import { Theme } from "theme.slint";
 import { Ic, AppIcon } from "icons.slint";
-import { CtrlButton, MenuItem, MenuSep, MenuSurface, SidePanel, Stepper, VolumeControl, ColorPicker } from "widgets.slint";
+import { CtrlButton, MenuItem, MenuSep, MenuSurface, SidePanel, Stepper, VolumeControl, ColorPicker, RowHover } from "widgets.slint";
 import { ChapterRow, TrackRow, PlaylistRow, SubSearchRow, InfoRow, ShortcutRow, PlayerState, Catalog } from "state.slint";
 import { ContextMenu } from "context-menu.slint";
 import { SubtitlePanel } from "subtitle-panel.slint";
@@ -49,6 +49,12 @@ export component MainWindow inherits Window {
     property <bool> show-remaining: false;
     property <bool> cursor-hidden;
     property <int> idle-ticks;
+    // True while the cursor is over a control bar. The auto-hide is driven by the
+    // background video TouchArea, which never sees moves over the bars' own
+    // buttons/seek/loop pills — so without this, hovering the controls would
+    // still let them time out and vanish. Set from each bar's wrapping TouchArea.
+    property <bool> top-hovered;
+    property <bool> bottom-hovered;
 
     // --- Context menu ---
     in-out property <bool> ctx-show <=> PlayerState.ctx-show;
@@ -256,7 +262,11 @@ export component MainWindow inherits Window {
         running: root.has-file && root.fullscreen && root.playing;
         triggered => {
             root.idle-ticks += 1;
-            if (root.idle-ticks >= 10 && root.active-panel == "" && !root.ctx-show && !root.url-show) {
+            // Hovering a control bar keeps it up (and resets the grace period, so
+            // moving off the bar onto the video gives a fresh countdown).
+            if (root.top-hovered || root.bottom-hovered) {
+                root.idle-ticks = 0;
+            } else if (root.idle-ticks >= 10 && root.active-panel == "" && !root.ctx-show && !root.url-show) {
                 root.controls-visible = false;
                 root.cursor-hidden = true;
             }
@@ -342,6 +352,16 @@ export component MainWindow inherits Window {
             spacing: 6px;
             HorizontalLayout { alignment: center; AppIcon { data: Ic.play-circle; size: 72px; color: #ffffff44; } }
             HorizontalLayout { alignment: center; Text { text: "Vayou"; color: #ffffff66; font-size: 14px; } }
+            HorizontalLayout {
+                alignment: center; spacing: 6px;
+                Text { text: @tr("Drop a file here or press"); color: #ffffff40; font-size: 12px; vertical-alignment: center; }
+                Rectangle {
+                    background: #ffffff1a; border-radius: 4px;
+                    chip := HorizontalLayout { padding-left: 6px; padding-right: 6px; padding-top: 2px; padding-bottom: 2px; Text { text: "Ctrl+O"; color: #ffffff73; font-size: 11px; } }
+                    width: chip.preferred-width; height: chip.preferred-height;
+                }
+                Text { text: @tr("to open"); color: #ffffff40; font-size: 12px; vertical-alignment: center; }
+            }
         }
     }
 
@@ -350,40 +370,44 @@ export component MainWindow inherits Window {
         y: 0;
         height: 36px;
         background: @linear-gradient(180deg, #000000b3 0%, #00000000 100%);
-        // Drag-to-move surface (behind the buttons, which capture their own
-        // clicks). A left press hands the move loop to Windows via win::start_drag.
+        // Drag-to-move surface wrapping the bar (the buttons, as descendants,
+        // capture their own clicks; a left press on the bare surface hands the
+        // move loop to Windows via win::start_drag). As the ancestor it also sees
+        // hover over the buttons, which keeps the bar from auto-hiding under the
+        // cursor in fullscreen.
         TouchArea {
+            changed has-hover => { root.top-hovered = self.has-hover; }
             pointer-event(e) => {
                 if (e.kind == PointerEventKind.down && e.button == PointerEventButton.left) {
                     root.start-window-drag();
                 }
             }
-        }
-        HorizontalLayout {
-            padding-left: 12px;
-            padding-right: 12px;
-            spacing: 2px;
-            VerticalLayout {
-                alignment: center;
-                CtrlButton {
-                    width: 28px; height: 28px; icon: Ic.menu; icon-size: 16px; square-hover: true;
-                    clicked => { root.request-context-menu(8px, 40px); }
+            HorizontalLayout {
+                padding-left: 12px;
+                padding-right: 12px;
+                spacing: 2px;
+                VerticalLayout {
+                    alignment: center;
+                    CtrlButton {
+                        width: 28px; height: 28px; icon: Ic.menu; icon-size: 16px; square-hover: true;
+                        clicked => { root.request-context-menu(8px, 40px); }
+                    }
                 }
-            }
-            Text {
-                text: root.media-title == "" ? "Vayou" : root.media-title;
-                color: #ffffffcc; font-size: 12px; vertical-alignment: center;
-                horizontal-stretch: 1; overflow: elide;
-            }
-            // Centered like the menu button on the left (a bare CtrlButton in the
-            // HorizontalLayout aligns to the top, sitting higher than the menu).
-            VerticalLayout {
-                alignment: center;
-                HorizontalLayout {
-                    spacing: 2px;
-                    CtrlButton { width: 32px; height: 28px; icon: Ic.win-min; icon-size: 16px; square-hover: true; clicked => { root.win-minimize(); } }
-                    CtrlButton { width: 32px; height: 28px; icon: Ic.win-max; icon-size: 14px; square-hover: true; clicked => { root.win-maximize(); } }
-                    CtrlButton { width: 32px; height: 28px; icon: Ic.close-x; icon-size: 16px; square-hover: true; danger: true; clicked => { root.win-close(); } }
+                Text {
+                    text: root.media-title == "" ? "Vayou" : root.media-title;
+                    color: #ffffffcc; font-size: 12px; vertical-alignment: center;
+                    horizontal-stretch: 1; overflow: elide;
+                }
+                // Centered like the menu button on the left (a bare CtrlButton in the
+                // HorizontalLayout aligns to the top, sitting higher than the menu).
+                VerticalLayout {
+                    alignment: center;
+                    HorizontalLayout {
+                        spacing: 2px;
+                        CtrlButton { width: 32px; height: 28px; icon: Ic.win-min; icon-size: 16px; square-hover: true; clicked => { root.win-minimize(); } }
+                        CtrlButton { width: 32px; height: 28px; icon: Ic.win-max; icon-size: 14px; square-hover: true; clicked => { root.win-maximize(); } }
+                        CtrlButton { width: 32px; height: 28px; icon: Ic.close-x; icon-size: 16px; square-hover: true; danger: true; clicked => { root.win-close(); } }
+                    }
                 }
             }
         }
@@ -394,7 +418,12 @@ export component MainWindow inherits Window {
         y: parent.height - self.height;
         height: bottombox.preferred-height;
         background: @linear-gradient(180deg, #00000000 0%, #000000cc 100%);
-        bottombox := VerticalLayout {
+        // Wrapping TouchArea: as the bar's ancestor it reports hover over every
+        // child (seek, loop pills, buttons), which keeps the bar from auto-hiding
+        // under the cursor in fullscreen. Children capture their own clicks.
+        TouchArea {
+            changed has-hover => { root.bottom-hovered = self.has-hover; }
+            bottombox := VerticalLayout {
             padding-left: 16px;
             padding-right: 16px;
             padding-top: 8px;
@@ -459,6 +488,16 @@ export component MainWindow inherits Window {
                     background: Theme.surface-container-highest;
                     border-radius: 2px;
                     animate height { duration: 100ms; }
+                    // Hover preview: a lighter fill up to the cursor (YouTube-style),
+                    // under the played fill so the played part stays accent-coloured.
+                    Rectangle {
+                        x: 0;
+                        width: clamp(seek.mouse-x, 0px, parent.width);
+                        height: parent.height;
+                        background: #ffffff33;
+                        border-radius: 2px;
+                        visible: seek.has-hover;
+                    }
                     // played progress
                     Rectangle {
                         x: 0;
@@ -550,6 +589,7 @@ export component MainWindow inherits Window {
                 CtrlButton { icon: Ic.playlist; active: root.active-panel == "playlist"; clicked => { root.toggle-panel("playlist"); } }
                 CtrlButton { icon: Ic.settings; active: root.active-panel == "settings"; clicked => { root.toggle-panel("settings"); } }
                 CtrlButton { icon: Ic.fullscreen; clicked => { root.toggle-fullscreen(); } }
+            }
             }
         }
     }
@@ -665,7 +705,7 @@ export component MainWindow inherits Window {
                 for item[i] in root.playlist-items: Rectangle {
                     height: 32px;
                     pa := TouchArea { double-clicked => { root.playlist-play(item.index); } }
-                    background: pa.has-hover ? #ffffff14 : (item.current ? #ffffff0d : transparent);
+                    RowHover { fill: pa.has-hover ? Theme.hover : (item.current ? #ffffff0d : transparent); }
                     HorizontalLayout {
                         padding-left: 12px; padding-right: 6px; spacing: 8px;
                         Rectangle {
@@ -691,7 +731,7 @@ export component MainWindow inherits Window {
                                 clicked => { root.playlist-remove(item.index); }
                                 Rectangle {
                                     background: rmta.has-hover ? #ef444433 : transparent;
-                                    border-radius: Theme.radius-sm;
+                                    border-radius: self.height / 2;
                                     AppIcon {
                                         x: (parent.width - self.width) / 2;
                                         y: (parent.height - self.height) / 2;

@@ -443,3 +443,18 @@ msgstr "バージョン {} が利用可能です。"
 
 msgid "Couldn't update: {}"
 msgstr "更新できませんでした: {}"
+
+msgid "No file is playing."
+msgstr "ファイルが再生されていません。"
+
+msgid "No subtitle track selected."
+msgstr "字幕トラックが選択されていません。"
+
+msgid "No subtitle text found to translate."
+msgstr "翻訳する字幕テキストが見つかりません。"
+
+msgid "These subtitles are image-based and can't be translated."
+msgstr "これらの字幕は画像ベースであり、翻訳できません。"
+
+msgid "Translation failed — the service is busy. Try again in a moment."
+msgstr "翻訳に失敗しました — サービスがビジー状態です。しばらくしてからもう一度試してください。"

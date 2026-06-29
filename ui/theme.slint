@@ -25,6 +25,9 @@ export global Theme {
     // Hover states (shared by menu rows and buttons).
     out property <color> hover: #ffffff1a;
     out property <color> hover-strong: #ffffff2e;
+    // Horizontal inset of a row's rounded hover pill from the menu/panel edges,
+    // so the highlight floats clear of the edges (and the overlay scrollbar).
+    out property <length> hover-inset: 6px;
 
     // Spacing rhythm, mirrored from the WebView (Tailwind px-3 / py-2 / gap-3).
     // One scale so menus, panels and rows share the same breathing room.

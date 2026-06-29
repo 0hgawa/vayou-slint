@@ -443,3 +443,18 @@ msgstr "الإصدار {} متاح."
 
 msgid "Couldn't update: {}"
 msgstr "تعذر التحديث: {}"
+
+msgid "No file is playing."
+msgstr "لا يوجد ملف قيد التشغيل."
+
+msgid "No subtitle track selected."
+msgstr "لم يتم تحديد مسار الترجمة."
+
+msgid "No subtitle text found to translate."
+msgstr "لم يتم العثور على نص الترجمة للترجمة."
+
+msgid "These subtitles are image-based and can't be translated."
+msgstr "تعتمد هذه الترجمات على الصور ولا يمكن ترجمتها."
+
+msgid "Translation failed — the service is busy. Try again in a moment."
+msgstr "فشلت الترجمة — الخدمة مشغولة. حاول مرة أخرى بعد قليل."

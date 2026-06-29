@@ -17,7 +17,7 @@ export component CtrlButton {
         background: ta.has-hover ? (root.danger ? #ef4444cc : #ffffff2e) : transparent;
         // Instant hover (no fade). Shape stays constant — tying the radius to
         // has-hover made it pop from circle to square, so it's kept fixed.
-        border-radius: (root.danger || root.square-hover) ? Theme.radius-sm : self.height / 2;
+        border-radius: root.square-hover ? Theme.radius-sm : self.height / 2;
         AppIcon {
             x: (parent.width - self.width) / 2;
             y: (parent.height - self.height) / 2;
@@ -157,7 +157,7 @@ export component VolumeControl {
                         x: 0;
                         width: parent.width * root.frac;
                         height: parent.height;
-                        background: Theme.accent;
+                        background: white;
                         border-radius: 2px;
                     }
                 }
@@ -177,6 +177,22 @@ export component VolumeControl {
     }
 }
 
+// Inset rounded hover fill shared by every list/menu/settings row, so the
+// highlight floats clear of the surface edges (and the overlay scrollbar) and
+// looks the same everywhere.
+export component RowHover inherits Rectangle {
+    // Caller passes the fill for the current state (e.g. hover ? Theme.hover :
+    // transparent), so list rows with a selected/current state can use it too.
+    in property <brush> fill;
+    // Root fills the row; the visible pill is inset within it.
+    Rectangle {
+        x: Theme.hover-inset;
+        width: parent.width - 2 * Theme.hover-inset;
+        background: root.fill;
+        border-radius: Theme.radius-sm;
+    }
+}
+
 // A row in a context menu or side panel: optional left icon (or a check
 // column), label, and an optional trailing value / key-hint / arrow.
 export component MenuItem {
@@ -191,11 +207,7 @@ export component MenuItem {
     callback clicked;
     height: Theme.row-h;
     ta := TouchArea { clicked => { root.clicked(); } }
-    // Full-bleed hover (mirrors the WebView build): the row fills the menu
-    // edge-to-edge and the menu's own clip rounds the top/bottom corners.
-    Rectangle {
-        background: ta.has-hover ? Theme.hover : transparent;
-    }
+    RowHover { fill: ta.has-hover ? Theme.hover : transparent; }
     HorizontalLayout {
         padding-left: Theme.pad;
         padding-right: Theme.pad;
@@ -242,17 +254,17 @@ export component Stepper {
     HorizontalLayout {
         padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap;
         Text { text: root.label; color: #ffffff80; font-size: 12px; vertical-alignment: center; horizontal-stretch: 1; }
-        VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 18px; icon: Ic.minus; square-hover: true; clicked => { root.dec(); } } }
+        VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 18px; icon: Ic.minus; clicked => { root.dec(); } } }
         VerticalLayout {
             alignment: center;
             Rectangle {
                 width: 52px; height: 26px; border-radius: self.height / 2;
                 background: rta.has-hover ? #ffffff14 : transparent;
-                rta := TouchArea { mouse-cursor: pointer; clicked => { root.reset(); } }
+                rta := TouchArea { clicked => { root.reset(); } }
                 Text { text: root.value; color: root.active ? Theme.accent : white; font-size: 12px; horizontal-alignment: center; vertical-alignment: center; }
             }
         }
-        VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 18px; icon: Ic.plus; square-hover: true; clicked => { root.inc(); } } }
+        VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 18px; icon: Ic.plus; clicked => { root.inc(); } } }
     }
 }
 
@@ -268,6 +280,10 @@ export component MenuSurface inherits Rectangle {
     drop-shadow-offset-y: 10px;
     drop-shadow-color: Theme.shadow;
     clip: true;
+    // Absorb clicks on the surface so a click on empty space inside a panel or
+    // menu doesn't fall through to the video area behind (which dismisses it).
+    // Content (in @children) renders on top, so its buttons still work.
+    TouchArea {}
     // Hairline of light along the top edge — clipped, so it follows the corners.
     Rectangle { y: 0; width: 100%; height: 1px; background: Theme.menu-highlight; }
     @children
@@ -295,7 +311,7 @@ export component SidePanel inherits MenuSurface {
             }
             VerticalLayout {
                 alignment: center;
-                CtrlButton { width: 26px; height: 26px; icon-size: 13px; icon: Ic.close-x; square-hover: true; clicked => { root.close(); } }
+                CtrlButton { width: 26px; height: 26px; icon-size: 13px; icon: Ic.close-x; clicked => { root.close(); } }
             }
         }
         @children
@@ -310,7 +326,7 @@ export component SettingToggleRow {
     callback toggled;
     height: Theme.setting-h;
     ta := TouchArea { clicked => { root.toggled(); } }
-    Rectangle { background: ta.has-hover ? #ffffff0a : transparent; }
+    RowHover { fill: ta.has-hover ? Theme.hover : transparent; }
     HorizontalLayout {
         padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap;
         VerticalLayout { alignment: center; AppIcon { data: root.icon; size: 20px; color: #ffffff8c; } }
@@ -328,7 +344,7 @@ export component SettingNavRow {
     callback clicked;
     height: 50px;
     ta := TouchArea { clicked => { root.clicked(); } }
-    Rectangle { background: ta.has-hover ? #ffffff0a : transparent; }
+    RowHover { fill: ta.has-hover ? Theme.hover : transparent; }
     HorizontalLayout {
         padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap;
         VerticalLayout { alignment: center; AppIcon { data: root.icon; size: 20px; color: #ffffff8c; } }
@@ -382,6 +398,10 @@ export component VScroll inherits Rectangle {
     fl := Flickable {
         width: 100%;
         height: 100%;
+        // Content spans the full width; the thumb is a thin overlay on the right
+        // edge. Rows use an inset rounded hover (see MenuItem), so the floating
+        // thumb never clashes with a row highlight and a non-scrolling list wastes
+        // no gutter — no width-vs-overflow feedback, so no layout loop.
         viewport-width: self.width;
         viewport-height: inner.preferred-height;
         inner := VerticalLayout {

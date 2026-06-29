@@ -124,7 +124,7 @@ export component SettingsPanel inherits Rectangle {
             HorizontalLayout {
                 height: 48px; padding-left: 16px; padding-right: 8px;
                 Text { text: @tr("Settings"); color: #ffffffe6; font-size: 14px; font-weight: 600; vertical-alignment: center; horizontal-stretch: 1; }
-                VerticalLayout { alignment: center; CtrlButton { width: 28px; height: 28px; icon-size: 13px; icon: Ic.close-x; square-hover: true; clicked => { PlayerState.active-panel = ""; } } }
+                VerticalLayout { alignment: center; CtrlButton { width: 28px; height: 28px; icon-size: 13px; icon: Ic.close-x; clicked => { PlayerState.active-panel = ""; } } }
             }
             // Body: rail + detail
             HorizontalLayout {
@@ -262,11 +262,11 @@ export component SettingsPanel inherits Rectangle {
                                 HorizontalLayout {
                                     padding-left: Theme.pad; padding-right: Theme.pad; height: 36px; spacing: 12px;
                                     Text { text: root.action-label(s.action); color: #ffffffe6; font-size: 13px; vertical-alignment: center; horizontal-stretch: 1; }
-                                    TouchArea {
+                                    ka := TouchArea {
                                         width: 110px; height: 26px;
                                         clicked => { PlayerState.rebinding-action = s.action; }
                                         Rectangle {
-                                            background: PlayerState.rebinding-action == s.action ? Theme.accent.with-alpha(0.25) : #ffffff10;
+                                            background: PlayerState.rebinding-action == s.action ? Theme.accent.with-alpha(0.25) : (ka.has-hover ? Theme.hover-strong : #ffffff10);
                                             border-radius: Theme.radius-sm;
                                             Text { text: PlayerState.rebinding-action == s.action ? @tr("Press a key...") : s.key; color: PlayerState.rebinding-action == s.action ? Theme.accent : #ffffffcc; font-size: 12px; horizontal-alignment: center; vertical-alignment: center; }
                                         }
