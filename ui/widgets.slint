@@ -232,14 +232,26 @@ export component MenuSep inherits Rectangle {
 export component Stepper {
     in property <string> label;
     in property <string> value;
+    // True when the value is off its default (≠ 0): the value turns accent and
+    // clicking it resets to the default.
+    in property <bool> active;
     callback dec();
     callback inc();
+    callback reset();
     height: Theme.row-h;
     HorizontalLayout {
         padding-left: Theme.pad; padding-right: Theme.pad; spacing: Theme.gap;
         Text { text: root.label; color: #ffffff80; font-size: 12px; vertical-alignment: center; horizontal-stretch: 1; }
         VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 18px; icon: Ic.minus; square-hover: true; clicked => { root.dec(); } } }
-        Text { text: root.value; color: white; font-size: 12px; width: 52px; horizontal-alignment: center; vertical-alignment: center; }
+        VerticalLayout {
+            alignment: center;
+            Rectangle {
+                width: 52px; height: 26px; border-radius: self.height / 2;
+                background: rta.has-hover ? #ffffff14 : transparent;
+                rta := TouchArea { mouse-cursor: pointer; clicked => { root.reset(); } }
+                Text { text: root.value; color: root.active ? Theme.accent : white; font-size: 12px; horizontal-alignment: center; vertical-alignment: center; }
+            }
+        }
         VerticalLayout { alignment: center; CtrlButton { width: 26px; height: 26px; icon-size: 18px; icon: Ic.plus; square-hover: true; clicked => { root.inc(); } } }
     }
 }

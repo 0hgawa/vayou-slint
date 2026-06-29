@@ -643,8 +643,10 @@ export component MainWindow inherits Window {
         MenuSep {}
         Stepper {
             label: @tr("Delay"); value: "\{round(root.audio-delay * 10) / 10}s";
+            active: root.audio-delay != 0;
             dec => { root.audio-delay = round((root.audio-delay - 0.1) * 10) / 10; root.set-audio-delay(root.audio-delay); }
             inc => { root.audio-delay = round((root.audio-delay + 0.1) * 10) / 10; root.set-audio-delay(root.audio-delay); }
+            reset => { root.audio-delay = 0; root.set-audio-delay(0); }
         }
     }
 

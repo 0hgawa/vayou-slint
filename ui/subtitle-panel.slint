@@ -83,8 +83,10 @@ export component SubtitlePanel inherits SidePanel {
         }
         Stepper {
             label: @tr("Delay"); value: "\{round(PlayerState.sub-delay * 10) / 10}s";
+            active: PlayerState.sub-delay != 0;
             dec => { PlayerState.sub-delay = round((PlayerState.sub-delay - 0.1) * 10) / 10; root.set-sub-delay(PlayerState.sub-delay); }
             inc => { PlayerState.sub-delay = round((PlayerState.sub-delay + 0.1) * 10) / 10; root.set-sub-delay(PlayerState.sub-delay); }
+            reset => { PlayerState.sub-delay = 0; root.set-sub-delay(0); }
         }
     }
 
