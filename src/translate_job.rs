@@ -12,7 +12,6 @@ use tracing::{info, warn};
 
 use crate::mpv::player::MpvPlayer;
 use crate::services::{subtitle_extract, tracks::TracksService, translate};
-use crate::state::AppState;
 
 /// Caps concurrent Google-Translate requests; more triggers 429s.
 const MAX_CONCURRENT_CHUNKS: usize = 8;
@@ -77,7 +76,7 @@ pub fn is_translatable_source(mpv: &MpvPlayer, id: i64) -> bool {
 
 /// Translate the selected subtitle into `target_lang`, adding it to mpv. Calls
 /// `progress(current, total, done)` as chunks complete.
-pub async fn run<F>(mpv: Arc<MpvPlayer>, app: Arc<AppState>, target_lang: String, progress: F) -> Result<String, String>
+pub async fn run<F>(mpv: Arc<MpvPlayer>, target_lang: String, progress: F) -> Result<String, String>
 where
     F: Fn(usize, usize, bool) + Send + Sync + 'static,
 {
@@ -86,7 +85,11 @@ where
 
     let prev_translation_source = remove_previous_translation(&mpv);
 
-    let video_path = app.with(|_, f| f.clone()).map_err(|e| e.to_string())?
+    // Resolve the video from what mpv is actually playing — not a stored
+    // "current file", which goes stale on playlist navigation (we'd translate
+    // the previous episode's subs).
+    let video_path = mpv.get_property_string("path").ok()
+        .filter(|p| !p.is_empty())
         .ok_or("No file playing")?;
 
     let tracks = TracksService::get_all(&mpv);

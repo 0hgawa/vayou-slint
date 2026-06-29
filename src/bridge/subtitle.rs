@@ -103,7 +103,7 @@ pub(crate) fn start_translation(ui: &MainWindow, mpv_state: &Arc<MpvState>, app_
                 }
             });
         };
-        let res = translate_job::run(mpv, app.clone(), lang, progress).await;
+        let res = translate_job::run(mpv, lang, progress).await;
         let _ = slint::invoke_from_event_loop(move || {
             let Some(ui) = w_done.upgrade() else { return };
             ui.set_translating(false);
