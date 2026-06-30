@@ -167,6 +167,10 @@ export component MainWindow inherits Window {
     callback win-maximize();
     callback win-close();
     callback start-window-drag();
+    // Hide/show the OS cursor. Slint only syncs `mouse-cursor` to the OS on a
+    // pointer event, but the auto-hide fires while the mouse is idle — so the
+    // arrow would linger over the video. Driven into Win32 ShowCursor instead.
+    callback set-os-cursor-hidden(bool);
     callback key(string, bool, bool, bool);
     callback submit-url(string);
     // Context-menu actions
@@ -255,6 +259,10 @@ export component MainWindow inherits Window {
     changed fullscreen => {
         if (!self.fullscreen) { root.controls-visible = true; root.cursor-hidden = false; }
     }
+    // Mirror the cursor-hidden state to the OS so the arrow actually vanishes
+    // while the mouse is idle (the reactive `mouse-cursor` binding alone only
+    // takes effect on the next pointer event).
+    changed cursor-hidden => { root.set-os-cursor-hidden(self.cursor-hidden); }
     // Only ticks while it can actually do something (fullscreen playback), so a
     // windowed or paused player isn't forced to repaint 4×/s.
     hide-timer := Timer {

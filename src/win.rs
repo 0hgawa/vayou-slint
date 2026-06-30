@@ -23,7 +23,7 @@ use windows::Win32::UI::Input::KeyboardAndMouse::ReleaseCapture;
 use windows::Win32::UI::WindowsAndMessaging::{
     CallWindowProcW,
     GetCursorPos, GetSystemMetrics, GetWindowLongPtrW, GetWindowRect, LoadImageW, PostMessageW,
-    SendMessageW, SetClassLongPtrW, SetWindowLongPtrW, SetWindowPos, ShowWindow, GCLP_HICON, GCLP_HICONSM,
+    SendMessageW, SetClassLongPtrW, SetWindowLongPtrW, SetWindowPos, ShowCursor, ShowWindow, GCLP_HICON, GCLP_HICONSM,
     GWLP_WNDPROC, GWL_STYLE, HTCAPTION, HWND_NOTOPMOST, HWND_TOPMOST, IMAGE_ICON, LR_DEFAULTCOLOR,
     LR_SHARED, SM_CXICON, SM_CXSMICON, SM_CYICON, SM_CYSMICON, SWP_NOACTIVATE, SWP_FRAMECHANGED,
     SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SW_MINIMIZE,
@@ -42,6 +42,7 @@ const FULLSCREEN: u8 = 2;
 static WIN_STATE: AtomicU8 = AtomicU8::new(NORMAL);
 static ALWAYS_ON_TOP: AtomicBool = AtomicBool::new(false);
 static SAVED_RECT: Mutex<Option<RECT>> = Mutex::new(None);
+static CURSOR_HIDDEN: AtomicBool = AtomicBool::new(false);
 
 const WM_DROPFILES: u32 = 0x0233;
 const WM_NCCALCSIZE: u32 = 0x0083;
@@ -298,6 +299,21 @@ pub fn minimize() {
     // SAFETY: `ui` valid; ShowWindow only changes show-state.
     unsafe {
         let _ = ShowWindow(ui, SW_MINIMIZE);
+    }
+}
+
+/// Show or hide the OS mouse cursor (used by the fullscreen idle auto-hide).
+/// `ShowCursor` keeps an internal display counter, so the swap-guard ensures we
+/// only ever decrement once to hide and increment once to show — never letting
+/// the counter drift out of balance. Unlike Slint's reactive `mouse-cursor`,
+/// this takes effect immediately even while the pointer is stationary.
+pub fn set_cursor_hidden(hidden: bool) {
+    if CURSOR_HIDDEN.swap(hidden, Ordering::Relaxed) == hidden {
+        return;
+    }
+    // SAFETY: ShowCursor only adjusts the system cursor display counter.
+    unsafe {
+        let _ = ShowCursor(!hidden);
     }
 }
 

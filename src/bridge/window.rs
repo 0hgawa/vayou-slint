@@ -27,6 +27,7 @@ pub(crate) fn wire(ui: &MainWindow) {
     ui.on_win_maximize(win::toggle_maximize);
     ui.on_win_close(|| { let _ = slint::quit_event_loop(); });
     ui.on_start_window_drag(win::start_drag);
+    ui.on_set_os_cursor_hidden(win::set_cursor_hidden);
     // Closing via the OS (Alt+F4, taskbar menu, etc.) must quit the loop too.
     // With `run_event_loop_until_quit`, an unhandled close only *hides* the
     // window — the process and mpv's audio would keep running in the background,
