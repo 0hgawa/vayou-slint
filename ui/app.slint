@@ -264,9 +264,10 @@ export component MainWindow inherits Window {
     // takes effect on the next pointer event).
     changed cursor-hidden => { root.set-os-cursor-hidden(self.cursor-hidden); }
     // Only ticks while it can actually do something (fullscreen playback), so a
-    // windowed or paused player isn't forced to repaint 4×/s.
+    // windowed or paused player isn't woken every frame. 100ms × 5 = ~500ms of
+    // idle before the cursor hides, matching the Tauri build's snappy feel.
     hide-timer := Timer {
-        interval: 250ms;
+        interval: 100ms;
         running: root.has-file && root.fullscreen && root.playing;
         triggered => {
             root.idle-ticks += 1;
@@ -274,7 +275,7 @@ export component MainWindow inherits Window {
             // moving off the bar onto the video gives a fresh countdown).
             if (root.top-hovered || root.bottom-hovered) {
                 root.idle-ticks = 0;
-            } else if (root.idle-ticks >= 10 && root.active-panel == "" && !root.ctx-show && !root.url-show) {
+            } else if (root.idle-ticks >= 5 && root.active-panel == "" && !root.ctx-show && !root.url-show) {
                 root.controls-visible = false;
                 root.cursor-hidden = true;
             }
