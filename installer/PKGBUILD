@@ -1,0 +1,107 @@
+# Maintainer: Ohgawa <https://github.com/0hgawa>
+#
+# Arch package — the counterpart of install-linux.sh, and the reason it exists:
+# a tarball cannot declare what it needs, so whoever unpacks one has to know to
+# install libmpv by hand. `depends` is that knowledge, written down once, in the
+# only place a package manager reads.
+#
+#   makepkg -si          # build and install
+#   makepkg -f --check   # rebuild, running the test suite
+#
+# To publish on the AUR the `pkgver`/`sha256sums` pair moves with each release;
+# nothing else here changes between versions.
+
+pkgname=vayou
+pkgver=0.1.4
+pkgrel=1
+pkgdesc='Native video player — libmpv engine, Slint UI, frameless single window'
+arch=('x86_64')
+url='https://github.com/0hgawa/vayou-slint'
+license=('MIT')
+
+# Every entry is something the binary reaches for by name at runtime, read out of
+# the build rather than guessed: `readelf -d` for what it links (fontconfig,
+# gcc-libs, glibc) and the dlopen names embedded in the binary for the rest.
+# Transitive libraries — mesa, llvm, libdrm, the whole driver stack under
+# libglvnd — are deliberately absent; they arrive with the packages below.
+depends=(
+  # The engine. Nothing plays without it, which is the entire point of this file.
+  'mpv'
+  # Subtitle extraction and translation shell out to it.
+  'ffmpeg'
+  # Linked directly (DT_NEEDED).
+  'fontconfig'
+  'gcc-libs'
+  'glibc'
+  # The GL/EGL entry points glutin resolves for the video underlay.
+  'libglvnd'
+  # Wayland: the session this runs in most often now.
+  'wayland'
+  # X11: still the fallback path, and winit opens all of these by name.
+  'libx11'
+  'libxcb'
+  'libxcursor'
+  'libxi'
+  'libxrender'
+  # Keyboard handling on both display servers.
+  'libxkbcommon'
+  'libxkbcommon-x11'
+)
+
+makedepends=('cargo')
+
+# Link-time optimisation off, and not as a preference: makepkg's `lto` puts
+# -flto in CFLAGS, which reaches the C sources `ring` (via rustls, via reqwest)
+# compiles through the cc crate. Those land as LLVM bitcode that the Rust link
+# step will not resolve, and the build dies on a page of "undefined symbol:
+# ring_core_*". Distributions that enable LTO globally — CachyOS does — hit this
+# on every Rust package that carries C, which is why the flag is disabled here
+# rather than in one machine's makepkg.conf.
+options=('!lto')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('0231a85a0d93c56e4e0f50808b64305d7dd01cfe1bc9c6814bc312e0228b043e')
+
+prepare() {
+  cd "vayou-slint-$pkgver"
+  # The repo pins an exact compiler in rust-toolchain.toml so CI, releases and
+  # developers share one. A package build is none of those: it must use the Rust
+  # the machine already has rather than making rustup download another.
+  export RUSTUP_TOOLCHAIN=stable
+  # Vendor now, with the network still allowed, so build() can run offline.
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "vayou-slint-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  # Keep the build directory out of the shipped binary: rustc bakes absolute
+  # paths into panic messages and debug info, and makepkg flags the result
+  # ("Package contains reference to $srcdir"). Appended rather than assigned, so
+  # a distribution's own RUSTFLAGS — CachyOS sets target-cpu — still apply.
+  export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=$srcdir=/build"
+  # --frozen: build the exact versions in the committed Cargo.lock, and fail
+  # rather than reach for the network. What the tests ran against is what ships.
+  cargo build --frozen --release
+}
+
+check() {
+  cd "vayou-slint-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  # --release, matching build(): a debug run would recompile the whole tree to
+  # test code that is not the code being packaged.
+  cargo test --frozen --release
+}
+
+package() {
+  cd "vayou-slint-$pkgver"
+
+  install -Dm755 target/release/vayou "$pkgdir/usr/bin/vayou"
+  install -Dm644 assets/icon.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/vayou.svg"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+  # The entry carries @BINDIR@ rather than a path, so the same file serves this
+  # package, install-linux.sh and the Flatpak build — each fills in its own.
+  sed 's|@BINDIR@|/usr/bin|' installer/vayou.desktop |
+    install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/vayou.desktop"
+}

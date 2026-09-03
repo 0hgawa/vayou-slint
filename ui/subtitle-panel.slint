@@ -1,0 +1,242 @@
+import { Theme } from "theme.slint";
+import { Ic, AppIcon } from "icons.slint";
+import { CtrlButton, MenuItem, MenuSep, SidePanel, Stepper, SettingNavRow, SettingToggleRow, SettingSliderRow, VScroll, RowHover, ColorPicker, UnderlineInput } from "widgets.slint";
+import { PlayerState, NamedLang } from "state.slint";
+
+// The red translate-error banner. The backend reports a short, stable code
+// (see translate_job::run); we map it to a localized message here, with a × to
+// dismiss (a timer in app.slint also auto-dismisses it). An unknown code — e.g.
+// a raw ffmpeg/extract error — is shown verbatim.
+component TrErrorBanner inherits Rectangle {
+    background: #ff6b6b1a;
+    HorizontalLayout {
+        padding-left: Theme.pad; padding-right: Theme.pad; padding-top: 8px; padding-bottom: 8px; spacing: 8px;
+        Text {
+            horizontal-stretch: 1; vertical-alignment: center;
+            color: #ff9a9a; font-size: 12px; wrap: word-wrap;
+            text: PlayerState.tr-error == "no-file" ? @tr("No file is playing.")
+                : PlayerState.tr-error == "no-track" ? @tr("No subtitle track selected.")
+                : PlayerState.tr-error == "no-entries" ? @tr("No subtitle text found to translate.")
+                : PlayerState.tr-error == "image-based" ? @tr("These subtitles are image-based and can't be translated.")
+                : PlayerState.tr-error == "rate-limited" ? @tr("Translation failed — the service is busy. Try again in a moment.")
+                : PlayerState.tr-error == "file-changed" ? @tr("The file changed while its subtitles were being translated.")
+                : PlayerState.tr-error == "partial" ? @tr("Some lines could not be translated — the service was busy. Translate again to fill them in.")
+                : PlayerState.tr-error;
+        }
+        VerticalLayout {
+            alignment: center;
+            CtrlButton { width: 20px; height: 20px; icon-size: 12px; icon: Ic.close-x; clicked => { PlayerState.tr-error = ""; } }
+        }
+    }
+}
+
+// The multi-page subtitle side panel (tracks · style · online search · translate).
+// State lives in PlayerState; the actions are declared here and forwarded to the
+// window's handlers at the instantiation site.
+export component SubtitlePanel inherits SidePanel {
+    callback reset-sub-style();
+    callback select-sub(int);
+    callback load-external-sub();
+    callback do-search();
+    callback apply-sub-style();
+    callback pick-color(string);
+    callback apply-picked-color(string, color);
+    callback translate-off();
+    callback set-translate-lang(string);
+    callback set-sub-delay(float);
+    callback download-sub(int);
+
+    property <[NamedLang]> translate-langs: [
+        { code: "pt", name: "Português" }, { code: "en", name: "English" }, { code: "es", name: "Español" },
+        { code: "fr", name: "Français" }, { code: "de", name: "Deutsch" }, { code: "it", name: "Italiano" },
+        { code: "ja", name: "日本語" }, { code: "ko", name: "한국어" }, { code: "zh", name: "中文" },
+        { code: "ru", name: "Русский" }, { code: "ar", name: "العربية" }, { code: "hi", name: "हिन्दी" },
+    ];
+    property <[NamedLang]> search-langs: [
+        { code: "", name: "All" }, { code: "por", name: "Português" }, { code: "pob", name: "Português (BR)" },
+        { code: "eng", name: "English" }, { code: "spa", name: "Español" }, { code: "fre", name: "Français" },
+        { code: "ger", name: "Deutsch" }, { code: "ita", name: "Italiano" }, { code: "dut", name: "Nederlands" },
+        { code: "rus", name: "Русский" }, { code: "jpn", name: "日本語" }, { code: "chi", name: "中文" },
+        { code: "kor", name: "한국어" }, { code: "ara", name: "العربية" }, { code: "tur", name: "Türkçe" },
+        { code: "pol", name: "Polski" }, { code: "rum", name: "Română" }, { code: "hrv", name: "Hrvatski" },
+        { code: "scc", name: "Srpski" }, { code: "hun", name: "Magyar" }, { code: "cze", name: "Čeština" },
+        { code: "hin", name: "हिन्दी" },
+    ];
+
+    heading: PlayerState.sub-page == "style" ? @tr("Style")
+        : PlayerState.sub-page == "color" ? (PlayerState.cp-target == "border" ? @tr("Border") : @tr("Text"))
+        : PlayerState.sub-page == "search" || PlayerState.sub-page == "searchLang" ? @tr("Search Online")
+        : PlayerState.sub-page == "translateLang" ? @tr("Translate")
+        : PlayerState.sub-page == "subfont" ? @tr("Font")
+        : @tr("Subtitles");
+    close => { PlayerState.active-panel = ""; }
+    // Sub-pages get a back arrow in the header; Style also gets a Reset action.
+    show-back: PlayerState.sub-page != "main";
+    back => { PlayerState.sub-page = (PlayerState.sub-page == "searchLang") ? "search" : ((PlayerState.sub-page == "subfont" || PlayerState.sub-page == "color") ? "style" : "main"); }
+    action-icon: PlayerState.sub-page == "style" ? Ic.refresh : "";
+    action-confirm: true;
+    action => { root.reset-sub-style(); }
+
+    if PlayerState.sub-page == "main": VerticalLayout {
+        VScroll {
+            max-height: 320px;
+            submain := VerticalLayout {
+                MenuItem {
+                    show-check: true; checked: !PlayerState.sub-active;
+                    active: !PlayerState.sub-active;
+                    label: @tr("Disable"); clicked => { root.select-sub(-1); }
+                }
+                for t in PlayerState.panel-sub-tracks: MenuItem { show-check: true; checked: t.selected; active: t.selected; label: t.label; clicked => { root.select-sub(t.id); } }
+                MenuSep {}
+                MenuItem { icon: Ic.file; label: @tr("Open local subtitle"); clicked => { root.load-external-sub(); } }
+                MenuItem { icon: Ic.search; label: @tr("Search online..."); arrow: true; clicked => { PlayerState.sub-page = "search"; root.do-search(); } }
+                MenuItem {
+                    icon: Ic.translate; label: @tr("Translate"); arrow: !PlayerState.translating;
+                    // Extraction reports no progress and is the long half on a
+                    // large file, so it names itself instead of showing a
+                    // percentage that would sit at 0 for minutes.
+                    value-hint: PlayerState.translating
+                        ? (PlayerState.tr-phase == "extracting"
+                            ? @tr("Extracting subtitles…")
+                            : "\{PlayerState.tr-total > 0 ? round(PlayerState.tr-progress / PlayerState.tr-total * 100) : 0}%")
+                        : (PlayerState.translate-lang == "off" ? "" : PlayerState.translate-lang-name);
+                    clicked => { PlayerState.sub-page = "translateLang"; }
+                }
+                MenuItem { icon: Ic.style; label: @tr("Style"); arrow: true; clicked => { PlayerState.sub-page = "style"; } }
+                MenuSep {}
+            }
+        }
+        if PlayerState.tr-error != "": TrErrorBanner {}
+        Stepper {
+            label: @tr("Delay"); value: "\{round(PlayerState.sub-delay * 10) / 10}s";
+            active: PlayerState.sub-delay != 0;
+            dec => { PlayerState.sub-delay = round((PlayerState.sub-delay - 0.1) * 10) / 10; root.set-sub-delay(PlayerState.sub-delay); }
+            inc => { PlayerState.sub-delay = round((PlayerState.sub-delay + 0.1) * 10) / 10; root.set-sub-delay(PlayerState.sub-delay); }
+            reset => { PlayerState.sub-delay = 0; root.set-sub-delay(0); }
+        }
+    }
+
+    if PlayerState.sub-page == "style": VScroll {
+        max-height: 365px;
+        VerticalLayout {
+            padding-top: 4px; padding-bottom: 8px;
+            SettingNavRow { icon: Ic.text-fields; title: @tr("Font"); value: PlayerState.sub-font; clicked => { PlayerState.sub-page = "subfont"; } }
+            SettingToggleRow { icon: Ic.format-bold; title: @tr("Bold"); on: PlayerState.sub-bold; toggled => { PlayerState.sub-bold = !PlayerState.sub-bold; root.apply-sub-style(); } }
+            SettingSliderRow { icon: Ic.format-size; title: @tr("Size"); value: "\{PlayerState.sub-size}"; svalue: PlayerState.sub-size; minimum: 10; maximum: 100; changed(v) => { PlayerState.sub-size = round(v); root.apply-sub-style(); } }
+            HorizontalLayout {
+                padding-left: Theme.pad; padding-right: Theme.pad; spacing: 8px; height: 50px;
+                VerticalLayout { alignment: center; Text { text: @tr("Text"); color: #ffffffe6; font-size: 13px; } }
+                VerticalLayout { alignment: center; Rectangle { width: 32px; height: 24px; border-radius: 4px; background: PlayerState.sub-color; border-width: 1px; border-color: #ffffff59; TouchArea { clicked => { root.pick-color("text"); PlayerState.sub-page = "color"; } } } }
+                Rectangle { width: 24px; }
+                VerticalLayout { alignment: center; Text { text: @tr("Border"); color: #ffffffe6; font-size: 13px; } }
+                VerticalLayout { alignment: center; Rectangle { width: 32px; height: 24px; border-radius: 4px; background: PlayerState.sub-border-color; border-width: 1px; border-color: #ffffff59; TouchArea { clicked => { root.pick-color("border"); PlayerState.sub-page = "color"; } } } }
+                Rectangle { horizontal-stretch: 1; }
+            }
+            SettingSliderRow { icon: Ic.line-weight; title: @tr("Border Size"); value: "\{PlayerState.sub-border-size}"; svalue: PlayerState.sub-border-size; minimum: 0; maximum: 10; changed(v) => { PlayerState.sub-border-size = round(v); root.apply-sub-style(); } }
+            SettingSliderRow { icon: Ic.contrast; title: @tr("Shadow"); value: "\{PlayerState.sub-shadow}"; svalue: PlayerState.sub-shadow; minimum: 0; maximum: 10; changed(v) => { PlayerState.sub-shadow = round(v); root.apply-sub-style(); } }
+            SettingSliderRow { icon: Ic.align-bottom; title: @tr("Position"); value: "\{PlayerState.sub-position}%"; svalue: PlayerState.sub-position; minimum: 0; maximum: 100; changed(v) => { PlayerState.sub-position = round(v); root.apply-sub-style(); } }
+        }
+    }
+
+    if PlayerState.sub-page == "color": HorizontalLayout {
+        alignment: center; padding-top: 4px; padding-bottom: 10px;
+        ColorPicker {
+            inline: true;
+            hue <=> PlayerState.cp-hue;
+            sat <=> PlayerState.cp-sat;
+            val <=> PlayerState.cp-val;
+            // Apply live so the colour shows on the actual subtitles as you drag;
+            // the back arrow returns to Style (the value is already committed).
+            changed current => { root.apply-picked-color(PlayerState.cp-target, self.current); }
+        }
+    }
+
+    if PlayerState.sub-page == "subfont": VScroll {
+        max-height: 320px;
+        fontlist := VerticalLayout {
+            for f in PlayerState.sub-fonts: MenuItem { show-check: true; checked: PlayerState.sub-font == f; active: PlayerState.sub-font == f; label: f; clicked => { PlayerState.sub-font = f; root.apply-sub-style(); PlayerState.sub-page = "style"; } }
+        }
+    }
+
+    if PlayerState.sub-page == "translateLang": VerticalLayout {
+        if PlayerState.tr-error != "": TrErrorBanner {}
+        VScroll {
+            max-height: 300px;
+            trlist := VerticalLayout {
+                MenuItem {
+                    show-check: true; checked: PlayerState.translate-lang == "off";
+                    active: PlayerState.translate-lang == "off"; label: @tr("Off");
+                    // A running job reports on this row rather than on a line of
+                    // its own above the list. Off is the row that stops it, so
+                    // this is where the reader is already looking — and the same
+                    // `value-hint` slot the Translate row uses on the main page,
+                    // instead of a floating label the list did not account for.
+                    value-hint: PlayerState.translating
+                        ? (PlayerState.tr-phase == "extracting"
+                            ? @tr("Extracting subtitles…")
+                            : "\{PlayerState.tr-total > 0 ? round(PlayerState.tr-progress / PlayerState.tr-total * 100) : 0}%")
+                        : "";
+                    clicked => { PlayerState.translate-lang-name = ""; root.translate-off(); PlayerState.sub-page = "main"; }
+                }
+                MenuSep {}
+                for l in root.translate-langs: MenuItem { show-check: true; checked: PlayerState.translate-lang == l.code; active: PlayerState.translate-lang == l.code; label: l.name; clicked => { PlayerState.translate-lang-name = l.name; root.set-translate-lang(l.code); PlayerState.sub-page = "main"; } }
+            }
+        }
+    }
+
+    if PlayerState.sub-page == "searchLang": VScroll {
+        max-height: 320px;
+        sllist := VerticalLayout {
+            for l in root.search-langs: MenuItem { show-check: true; checked: PlayerState.search-lang == l.code; active: PlayerState.search-lang == l.code; label: l.name; clicked => { PlayerState.search-lang = l.code; PlayerState.search-lang-name = l.name; PlayerState.sub-page = "search"; root.do-search(); } }
+        }
+    }
+
+    if PlayerState.sub-page == "search": VerticalLayout {
+        // No horizontal padding here: the rows below carry their own, like every
+        // other list, so their hover pill sits the same distance from the panel
+        // edge. Only the search field — which is not a row — is inset from here.
+        padding-bottom: 8px; spacing: 6px;
+        HorizontalLayout {
+            padding-left: Theme.pad; padding-right: Theme.pad;
+            UnderlineInput {
+                text <=> PlayerState.search-query;
+                accepted => { root.do-search(); }
+                // Trailing content, inside the underline.
+                VerticalLayout { alignment: center;
+                    searchbtn := TouchArea {
+                        width: 26px; height: 26px;
+                        clicked => { root.do-search(); }
+                        Rectangle {
+                            background: searchbtn.has-hover ? #ffffff2e : transparent;
+                            border-radius: self.height / 2;
+                            AppIcon { x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2; data: Ic.search; size: 14px; color: white; }
+                        }
+                    }
+                }
+            }
+        }
+        MenuItem { icon: Ic.globe; label: PlayerState.search-lang-name; arrow: true; clicked => { PlayerState.sub-page = "searchLang"; } }
+        VScroll {
+            max-height: 240px;
+            VerticalLayout {
+                if PlayerState.searching: Text { text: @tr("Searching..."); color: #ffffff66; font-size: 12px; height: 60px; horizontal-alignment: center; vertical-alignment: center; }
+                if !PlayerState.searching && PlayerState.search-results.length == 0 && PlayerState.has-searched: Text { text: PlayerState.search-error == "" ? @tr("No results") : PlayerState.search-error; color: #ffffff4d; font-size: 12px; height: 60px; horizontal-alignment: center; vertical-alignment: center; }
+                for r[i] in PlayerState.search-results: Rectangle {
+                    height: rrow.preferred-height + 10px;
+                    ra := TouchArea { clicked => { if (PlayerState.downloading-index < 0) { root.download-sub(i); } } }
+                    RowHover { fill: ra.has-hover ? Theme.hover : transparent; }
+                    rrow := HorizontalLayout {
+                        padding-left: Theme.pad; padding-right: Theme.pad;
+                        padding-top: 6px; padding-bottom: 6px; spacing: 8px;
+                        Text { text: r.lang; color: Theme.accent; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; width: 32px; }
+                        VerticalLayout {
+                            horizontal-stretch: 1; spacing: 2px;
+                            Text { text: r.name; color: #ffffffd9; font-size: 12px; wrap: word-wrap; }
+                            Text { text: r.downloads + (r.matched != "" ? "  •  " + r.matched : ""); color: #ffffff66; font-size: 12px; }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

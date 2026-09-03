@@ -1,0 +1,25 @@
+[Desktop Entry]
+Type=Application
+Name=Vayou
+GenericName=Video Player
+Comment=Play video and audio files
+# @BINDIR@ is substituted by install-linux.sh with the directory the binary
+# landed in; the Flatpak build rewrites it to a bare `vayou`, which is on PATH
+# inside the sandbox.
+Exec=@BINDIR@/vayou %f
+Icon=vayou
+Terminal=false
+Categories=AudioVideo;Video;Player;
+# Must equal the Wayland app_id / X11 WM_CLASS the window announces (see APP_ID
+# in src/main.rs), or the shell shows the running window as a separate,
+# nameless application rather than as this entry.
+StartupWMClass=vayou
+StartupNotify=true
+# %f, not %F: the binary opens the first path it is handed, so offering to take
+# several would drop all but one without saying so.
+#
+# The canonical names come from the installed shared-mime-info, not from habit —
+# several of the ones everyone writes from memory are now aliases (matroska and
+# avi in particular). The aliases are listed too, since a distribution shipping
+# an older database still resolves files to them.
+MimeType=video/mp4;video/matroska;video/x-matroska;video/vnd.avi;video/x-msvideo;video/quicktime;video/x-ms-wmv;video/x-flv;video/webm;video/mpeg;video/3gpp;video/mp2t;video/x-m4v;audio/mpeg;audio/flac;audio/vnd.wave;audio/x-wav;audio/ogg;audio/mp4;audio/aac;audio/x-ms-wma;audio/opus;

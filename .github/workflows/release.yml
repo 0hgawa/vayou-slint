@@ -1,0 +1,209 @@
+name: Release
+
+# Tag push cuts the release; the manual trigger builds both platforms and
+# uploads them as artifacts without publishing anything, for checking a build
+# without spending a version number.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Both platforms build in one run so the feed can carry both halves. Doing
+  # this by hand meant carrying latest.json between two machines and merging it,
+  # and a release that skipped a machine published a feed with one platform
+  # missing -- which is how every Linux build ended up reading
+  # "no linux-x86_64 in feed" when it checked for updates.
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            bin: vayou.exe
+            platform: windows-x86_64
+          - os: ubuntu-latest
+            bin: vayou
+            platform: linux-x86_64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # What backend-winit and renderer-femtovg link against. libmpv and ffmpeg
+      # are deliberately absent: both are resolved at runtime, and on Linux they
+      # come from the distribution rather than from this build.
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libx11-dev libx11-xcb-dev libxcb1-dev libxcursor-dev libxi-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev \
+            libfontconfig1-dev libgl1-mesa-dev
+
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release
+
+      # The NSIS installer bundles the two runtime sidecars, so it needs them
+      # present. They live in the sibling repo's deps release rather than in git
+      # (~220 MB, past GitHub's per-file limit) and are the same files both
+      # projects load.
+      - name: Fetch native binaries for the installer
+        if: runner.os == 'Windows'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          gh release download deps-v1 --repo 0hgawa/vayou-desktop `
+            --pattern 'libmpv-2.dll' --pattern 'ffmpeg.exe' --dir target/release
+
+      # The runner image does not ship NSIS, despite carrying most of the other
+      # Windows packaging tools.
+      - name: Install NSIS
+        if: runner.os == 'Windows'
+        run: choco install nsis --no-progress -y
+
+      - name: Build the installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ver = (Select-String -Path Cargo.toml -Pattern '^version\s*=\s*"([^"]+)"' |
+                  Select-Object -First 1).Matches.Groups[1].Value
+          # Same lookup order as installer/build.ps1. choco puts it under the x86
+          # tree, and PATH is not refreshed inside this step, so the explicit
+          # paths are what actually find it.
+          $makensis = @(
+            (Get-Command makensis -ErrorAction SilentlyContinue).Source,
+            (Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'),
+            (Join-Path $env:ProgramFiles 'NSIS\makensis.exe')
+          ) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+          if (-not $makensis) { throw 'makensis not found after installing NSIS' }
+          & $makensis "/DAPP_VERSION=$ver" "/DAPP_VERSION_4=$ver.0" installer/vayou.nsi
+          if ($LASTEXITCODE -ne 0) { throw "makensis failed ($LASTEXITCODE)" }
+
+      # The tarball is for first-time installs: the binary alone is what the
+      # updater swaps, so it travels separately and under a name that does not
+      # change between releases.
+      - name: Package the Linux tarball
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          ver=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
+          # Same layout build-linux.sh produces, including the icon's name: the
+          # desktop entry says Icon=vayou, so the file has to be vayou.svg.
+          stage="vayou-$ver"
+          install -Dm755 target/release/vayou         "$stage/vayou"
+          install -Dm755 installer/install-linux.sh   "$stage/install.sh"
+          install -Dm644 installer/vayou.desktop      "$stage/vayou.desktop"
+          install -Dm644 assets/icon.svg              "$stage/vayou.svg"
+          tar -czf "vayou-$ver-linux-x86_64.tar.gz" "$stage"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}
+          path: |
+            target/release/${{ matrix.bin }}
+            installer/Vayou-Setup.exe
+            vayou-*-linux-x86_64.tar.gz
+          if-no-files-found: ignore
+
+  # Signing is its own job so the key is reachable from exactly one place, and
+  # that place sits behind the `release` environment's required approval.
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist/windows-x86_64/target/release/vayou.exe
+            dist/linux-x86_64/target/release/vayou
+
+      # MINISIGN_SECRET_KEY holds the key as it lives in .keys/vayou.key. Its
+      # passphrase is empty, so MINISIGN_PASSWORD is optional and the redirect
+      # feeds a bare newline when it is unset -- minisign reads the passphrase
+      # from stdin whenever stdin is not a terminal, and offers no flag for it.
+      - name: Sign both binaries and build the update feed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY }}
+          MINISIGN_PASSWORD: ${{ secrets.MINISIGN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          [ -n "${MINISIGN_SECRET_KEY:-}" ] || { echo 'MINISIGN_SECRET_KEY is not set' >&2; exit 1; }
+
+          curl -sSfL -o ms.zip \
+            https://github.com/jedisct1/minisign/releases/download/0.12/minisign-0.12-linux.tar.gz
+          tar -xzf ms.zip
+          # By architecture, not by whichever `find` happened to reach first:
+          # the tarball carries x86_64 and aarch64 builds under sibling
+          # directories, and directory order is not alphabetical or stable. The
+          # first match was the right one until the day it was the aarch64
+          # binary, and the release died on "Exec format error".
+          ms="./minisign-linux/$(uname -m)/minisign"
+          [ -x "$ms" ] || { echo "no minisign for $(uname -m) in the tarball" >&2; exit 1; }
+
+          # Both files land outside the checkout so no later upload glob can
+          # sweep them into a release asset.
+          key="$RUNNER_TEMP/signing.key"
+          pw="$RUNNER_TEMP/signing.pw"
+          printf '%s' "$MINISIGN_SECRET_KEY" > "$key"
+          printf '%s\n' "${MINISIGN_PASSWORD:-}" > "$pw"
+          trap 'rm -f "$key" "$pw"' EXIT
+
+          win=dist/windows-x86_64/target/release/vayou.exe
+          lin=dist/linux-x86_64/target/release/vayou
+          "$ms" -S -s "$key" -m "$win" < "$pw"
+          "$ms" -S -s "$key" -m "$lin" < "$pw"
+
+          # Verify against the very key the app has compiled in, read out of the
+          # source rather than repeated here: a second copy is a second thing to
+          # forget on the next rotation, and the failure it buys is a release
+          # every client rejects.
+          pub=$(grep -oP 'UPDATE_PUBKEY:\s*&str\s*=\s*"\K[^"]+' src/update.rs)
+          echo "verifying against UPDATE_PUBKEY $pub"
+          "$ms" -V -P "$pub" -m "$win"
+          "$ms" -V -P "$pub" -m "$lin"
+
+          # One feed carrying both platforms. update.rs reads `signature` as the
+          # whole .minisig text, picks its own entry by PLATFORM_KEY, and
+          # compares `version` with semver against the running build.
+          tag='${{ github.ref_name }}'
+          repo='${{ github.repository }}'
+          jq -n \
+            --arg v "${tag#v}" \
+            --arg wu "https://github.com/$repo/releases/latest/download/vayou.exe" \
+            --arg ws "$(cat "$win.minisig")" \
+            --arg lu "https://github.com/$repo/releases/latest/download/vayou" \
+            --arg ls "$(cat "$lin.minisig")" \
+            '{version:$v, platforms:{"windows-x86_64":{url:$wu,signature:$ws},
+                                     "linux-x86_64":{url:$lu,signature:$ls}}}' \
+            > latest.json
+
+          gh release create "$tag" --draft --title "Vayou $tag" --generate-notes \
+            "$win" "$lin" latest.json \
+            dist/windows-x86_64/installer/Vayou-Setup.exe \
+            dist/linux-x86_64/vayou-*-linux-x86_64.tar.gz

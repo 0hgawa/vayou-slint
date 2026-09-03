@@ -1,0 +1,58 @@
+name: CI
+
+# Build, lint and test on every push and PR. libmpv/ffmpeg are loaded
+# dynamically at runtime, so neither is needed to compile or to run the unit
+# tests (the tests cover pure logic only — no mpv instance is created).
+#
+# Both platforms run the same two gates. Windows and Linux compile different
+# halves of the frameless-window chrome and of the mpv/ffmpeg lookups, so a
+# change that only builds on one is a change nobody would notice until the
+# other was next built by hand.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check:
+    strategy:
+      # Report both platforms on a failure — one being red should not hide
+      # whether the other is too.
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The winit/femtovg backend links against the X11, Wayland and font
+      # stacks. These are the development headers for what `backend-winit` and
+      # `renderer-femtovg` need; libmpv and ffmpeg are deliberately absent,
+      # since both are resolved at runtime.
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libx11-dev libx11-xcb-dev libxcb1-dev libxcursor-dev libxi-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev \
+            libfontconfig1-dev libgl1-mesa-dev
+
+      # The version and its components come from rust-toolchain.toml, so CI
+      # compiles with the same compiler as a developer machine and the release
+      # build. Tracking `stable` instead meant a new Rust release could turn the
+      # gate below red on untouched code, which is exactly what happened.
+      - name: Install the pinned toolchain
+        run: rustup toolchain install
+
+      - name: Cache cargo registry + build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Clippy (pedantic + nursery, warnings denied)
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Tests
+        run: cargo test --all-targets

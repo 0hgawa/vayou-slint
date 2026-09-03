@@ -1,0 +1,70 @@
+// Dark M3 palette, mirrored from the WebView build's app.css (@theme block).
+// One source of truth for colours/shape/motion so components don't hardcode hex.
+export global Theme {
+    // Brand
+    out property <color> accent: #ffb300;
+    out property <color> on-accent: #1a1a1a;
+
+    // Surfaces (M3 hierarchy)
+    out property <color> surface-container-highest: #2e2e2e; // slider tracks
+
+    // Outlines
+    out property <color> outline: #8e8e8e;
+
+    // Floating surfaces (menus, dropdowns, pickers): a subtle tonal gradient
+    // (lighter at the top), a hairline border + a 1px highlight along the top
+    // edge, and a directional shadow — the macOS/Fluent "lifted glass" recipe.
+    // Slightly translucent (f7 ≈ 97%): enough life over video without hurting
+    // legibility, and free on small overlays (no fullscreen flip path to lose).
+    out property <color> menu-top: #1a1a1af7;
+    out property <color> menu-bottom: #121212f7;
+    out property <color> menu-border: #ffffff14;
+    out property <color> menu-highlight: #ffffff14;
+    out property <color> shadow: #000000b3;
+
+    // Hover states (shared by menu rows and buttons).
+    out property <color> hover: #ffffff1a;
+    out property <color> hover-strong: #ffffff2e;
+    // Horizontal inset of a row's rounded hover pill from the menu/panel edges,
+    // so the highlight floats clear of the edges and of the overlay scrollbar.
+    //
+    // Sized against VScroll's thumb, which is centred in a 12px bar: 4px wide at
+    // rest, so its left edge sits 8px from the panel edge, and 6px while the
+    // pointer is on it, so 9px. At 9px the pill clears the resting thumb by a
+    // pixel and meets the widened one without ever running under it.
+    out property <length> hover-inset: 9px;
+
+    // The same idea on the other axis, but for a different reason and at a
+    // different scale. Horizontally the pill dodges the scrollbar; vertically it
+    // only has to stop short of the separator above and below, which a full-height
+    // pill sits flush against.
+    //
+    // 2px, not the half pixel this started as: at 10% opacity a sub-pixel edge is
+    // resolved by antialiasing into something nobody can see. The gap has to land
+    // on whole pixels to read as a gap at all. On a 36px row this leaves 32px of
+    // pill, which still reads as a full row rather than a floating chip.
+    out property <length> hover-inset-y: 2px;
+
+    // Spacing rhythm shared by menus, panels and rows, so a row's label lines up
+    // with the headings above it.
+    //
+    // `pad` is measured from the surface edge, but a row's label is read against
+    // the hover pill around it, which starts `hover-inset` further in: the gap
+    // the eye actually sees is the difference between the two, currently 11px.
+    // Raise this, not `hover-inset`, to give a label more room — the inset is
+    // pinned to the scrollbar's geometry.
+    out property <length> pad: 20px;       // content inset for panels/menus/settings (the "drops")
+    out property <length> gap: 12px;       // icon ↔ label gap (gap-3)
+    out property <length> row-h: 36px;     // menu/list row height
+    out property <length> setting-h: 44px; // settings row height
+
+    // Shape
+    out property <length> radius-sm: 8px;
+    out property <length> radius-md: 12px;
+
+    // Motion
+    out property <duration> fast: 100ms;
+
+    // The UI font is not a constant here: it depends on the platform, so it is
+    // pushed from Rust into PlayerState.ui-font and read from there.
+}
