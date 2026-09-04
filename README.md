@@ -144,10 +144,13 @@ The release carries, per platform:
 - **Windows** — `vayou.exe` (what the updater swaps) and `Vayou-Setup.exe`, an
   NSIS per-user installer needing no admin or UAC, bundling `vayou.exe` +
   `libmpv-2.dll` + `ffmpeg.exe`.
-- **Linux** — `vayou` and `vayou-<version>-linux-x86_64.tar.gz` (binary +
-  `install.sh` + desktop entry + icon). Nothing is bundled: libmpv and ffmpeg are
-  distribution packages resolved at runtime, which is why a libmpv bump needs a
-  fresh installer on Windows but no new release on Linux.
+- **Linux** — `vayou` (what the updater swaps),
+  `vayou-<version>-linux-x86_64.tar.gz` (binary + `install.sh` + desktop entry +
+  icon), `vayou_<version>_amd64.deb`, and the `PKGBUILD` for Arch. Nothing is
+  bundled: libmpv and ffmpeg are distribution packages resolved at runtime, which
+  is why a libmpv bump needs a fresh installer on Windows but no new release on
+  Linux. The `.deb` and the `PKGBUILD` are the two that say so out loud — each
+  declares those dependencies, which is what a tarball has no way to do.
 
 [`build.ps1`](installer/build.ps1) and
 [`build-linux.sh`](installer/build-linux.sh) still do the same work locally, for
@@ -172,13 +175,25 @@ on the last step.
 
 ### Installing on Linux
 
-On Arch and its derivatives, through the package manager — the one route where
-libmpv and ffmpeg arrive on their own, because a package can say it needs them
-and a tarball cannot:
+On Arch and its derivatives, through the package manager — one of the two routes
+where libmpv and ffmpeg arrive on their own, because a package can say it needs
+them and a tarball cannot:
 
 ```sh
-curl -O https://raw.githubusercontent.com/0hgawa/vayou-slint/master/installer/PKGBUILD
+curl -O https://github.com/0hgawa/vayou-slint/releases/latest/download/PKGBUILD
 makepkg -si
+```
+
+That file comes from the release rather than from the tree, and carries the
+version and checksum of the release it was published with — neither of which can
+be written before the tag exists, since the checksum measures an archive that
+contains the recipe. [`installer/PKGBUILD.in`](installer/PKGBUILD.in) is the
+template it is filled in from; on its own it builds nothing.
+
+On Debian 13 / Ubuntu 24.04 and newer, the `.deb` from the same release:
+
+```sh
+sudo apt install ./vayou_<version>_amd64.deb
 ```
 
 Anywhere else, from the tarball, or straight from a source tree after

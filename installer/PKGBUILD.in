@@ -5,14 +5,25 @@
 # install libmpv by hand. `depends` is that knowledge, written down once, in the
 # only place a package manager reads.
 #
+# This is the template, not a usable PKGBUILD: `@PKGVER@` and `@SHA256@` are
+# filled in by the release workflow and the result is published as a release
+# asset. Nothing else here moves between versions.
+#
+# It has to work that way round. The checksum measures the source archive GitHub
+# generates for a tag, and that archive contains this file — a hash written
+# before the tag would have to predict its own effect on the tree it is hashing.
+# Generating after the tag is what breaks the circle, and keeping only a template
+# in the repository is what stops a second, permanently wrong copy existing
+# beside the generated one.
+#
+# The finished file, matching the version it was built for:
+#
+#   curl -O https://github.com/0hgawa/vayou-slint/releases/latest/download/PKGBUILD
 #   makepkg -si          # build and install
 #   makepkg -f --check   # rebuild, running the test suite
-#
-# To publish on the AUR the `pkgver`/`sha256sums` pair moves with each release;
-# nothing else here changes between versions.
 
 pkgname=vayou
-pkgver=0.1.5
+pkgver=@PKGVER@
 pkgrel=1
 pkgdesc='Native video player — libmpv engine, Slint UI, frameless single window'
 arch=('x86_64')
@@ -59,7 +70,7 @@ makedepends=('cargo')
 # rather than in one machine's makepkg.conf.
 options=('!lto')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('d6172964307997d67fe1f5b1a6734f27790f5ab777d9f68432a3987ea7709310')
+sha256sums=('@SHA256@')
 
 prepare() {
   cd "vayou-slint-$pkgver"

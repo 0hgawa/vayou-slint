@@ -214,8 +214,29 @@ jobs:
                                      "linux-x86_64":{url:$lu,signature:$ls}}}' \
             > latest.json
 
+          # The Arch recipe, filled in here because it cannot be filled in
+          # earlier: its checksum measures the source archive GitHub generates
+          # for this tag, and that archive contains the template it is built
+          # from. Written before the tag, the hash would have to predict its own
+          # effect on the tree it hashes; written now, the tag exists and the
+          # answer is just a download away.
+          #
+          # Published as a release asset rather than committed back, so the file
+          # a user fetches always matches a release that exists — and so no
+          # second, permanently stale copy sits in the repository beside it.
+          curl -sSLo pkgsrc.tar.gz "https://github.com/$repo/archive/refs/tags/$tag.tar.gz"
+          sha=$(sha256sum pkgsrc.tar.gz | cut -d' ' -f1)
+          sed -e "s/@PKGVER@/${tag#v}/" -e "s/@SHA256@/$sha/" \
+              installer/PKGBUILD.in > PKGBUILD
+          # A leftover marker means the template and this step have drifted, and
+          # the package would fail for whoever downloaded it rather than here.
+          if grep -q '@PKGVER@\|@SHA256@' PKGBUILD; then
+            echo "error: PKGBUILD still carries a placeholder after substitution." >&2
+            exit 1
+          fi
+
           gh release create "$tag" --draft --title "Vayou $tag" --generate-notes \
-            "$win" "$lin" latest.json \
+            "$win" "$lin" latest.json PKGBUILD \
             dist/windows-x86_64/installer/Vayou-Setup.exe \
             dist/linux-x86_64/vayou-*-linux-x86_64.tar.gz \
             dist/linux-x86_64/vayou_*_amd64.deb
