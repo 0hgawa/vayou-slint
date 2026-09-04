@@ -92,21 +92,60 @@ fn write_string(subkey: &str, name: Option<&str>, value: &str) -> bool {
 /// returning that directory.
 fn write_icons() -> Option<PathBuf> {
     let dir = dirs::data_local_dir()?.join("Vayou").join("fileicons");
+
+    // The icons are `include_bytes!` — part of the executable, so they can only
+    // differ from what is on disk after an update. A stamp carrying the version
+    // that wrote them turns the check into one short read: 19 files and 224 KB
+    // were being rewritten byte-for-byte identically on every single launch,
+    // each write walked by the virus scanner.
+    //
+    // The version, not the file sizes: a size that matches proves nothing about
+    // content, and comparing the content itself means reading the 224 KB to
+    // avoid writing it.
+    let stamp = dir.join("version");
+    if std::fs::read_to_string(&stamp).is_ok_and(|v| v == env!("CARGO_PKG_VERSION")) {
+        return Some(dir);
+    }
+
     std::fs::create_dir_all(&dir).ok()?;
     for (ext, bytes) in ICONS {
         let _ = std::fs::write(dir.join(format!("{ext}.ico")), bytes);
     }
+    // Last, so an interrupted run leaves no stamp and writes again next time
+    // rather than claiming icons it never finished putting there.
+    let _ = std::fs::write(&stamp, env!("CARGO_PKG_VERSION"));
     Some(dir)
+}
+
+/// Whether the shell could launch *this* copy and have it play something: is
+/// libmpv sitting beside the executable?
+///
+/// That the running process loaded libmpv is a different question, and the wrong
+/// one. It may have come from PATH — which is how `dev.bat` supplies it — and
+/// PATH is not what Explorer hands a program it starts for a double-clicked
+/// file. A build that registers on that basis points every film on the machine
+/// at a copy that works only when launched the way the developer launches it.
+///
+/// The same directories the loader searches, in the same order, so the answer
+/// here and the outcome there cannot disagree.
+fn libmpv_beside_exe(exe: &std::path::Path) -> bool {
+    let Some(dir) = exe.parent() else { return false };
+    crate::mpv::ffi::LIB_CANDIDATES
+        .iter()
+        .any(|name| dir.join(name).exists() || dir.join("binaries").join(name).exists())
 }
 
 /// Register (or refresh) the associations, unless they already point here.
 pub fn ensure_registered() {
     let Ok(exe) = std::env::current_exe() else { return };
+    if !libmpv_beside_exe(&exe) {
+        return;
+    }
     let exe = exe.to_string_lossy().replace('/', "\\");
     let command = format!("\"{exe}\" \"%1\"");
 
-    // Always refresh the bundled icons (cheap, on a background thread) so an
-    // updated icon set takes effect on the next launch.
+    // Put the bundled icons on disk if this version has not already done so, so
+    // an updated icon set takes effect on the next launch.
     let Some(icondir) = write_icons() else { return };
 
     // Registry already points here → icons refreshed, nothing else to do.

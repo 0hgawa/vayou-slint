@@ -92,6 +92,28 @@ pub(crate) fn spawn_mpv(weak: slint::Weak<MainWindow>, mpv_state: Arc<MpvState>,
                 ui.window().request_redraw();
             }
         });
+
+        // Claim the media file types — last, and only with a working player in
+        // hand.
+        //
+        // The condition is the point. Registration rewrites the machine's
+        // associations to whichever executable is running, and doing that at
+        // startup meant any copy claimed every video on the system before
+        // knowing whether it could open one. The release publishes a bare
+        // `vayou.exe` for the updater to swap in; downloaded and run from a
+        // folder with no libmpv beside it, that copy left every film pointing at
+        // a program that cannot play films — worse than the error window it
+        // shows for itself, because the damage outlives the process. Reaching
+        // this line means mpv loaded, so this build plays video, so it may say
+        // so.
+        //
+        // Last, because it is not free: the icon set is 19 files rewritten on
+        // every launch, each one walked by the virus scanner. Nothing above
+        // waits on it, so the cost lands where no one is watching — after the
+        // player is up, the events are flowing and the first frame is already
+        // requested.
+        #[cfg(all(windows, not(debug_assertions)))]
+        crate::file_assoc::ensure_registered();
     });
 }
 

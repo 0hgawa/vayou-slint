@@ -59,6 +59,18 @@ pub const INSTALL_STEPS: &str =
 #[cfg(windows)]
 pub const INSTALL_STEPS: &str = "Reinstall Vayou — libmpv-2.dll belongs beside vayou.exe.";
 
+/// The libmpv filenames this build will try, in order — the first that loads
+/// wins, and the older sonames are the fallback.
+///
+/// At module scope rather than inside `load` because `file_assoc` asks the same
+/// question from the other side: whether one of these sits beside the
+/// executable, which is what decides if the shell can launch this copy and have
+/// it play anything.
+#[cfg(windows)]
+pub(crate) const LIB_CANDIDATES: &[&str] = &["libmpv-2.dll", "mpv-2.dll"];
+#[cfg(unix)]
+const LIB_CANDIDATES: &[&str] = &["libmpv.so.2", "libmpv.so.1", "libmpv.so"];
+
 impl MpvFfi {
     /// Get the global FFI instance, or error if not yet initialized.
     pub fn global() -> Result<&'static Self, MpvError> {
@@ -76,12 +88,6 @@ impl MpvFfi {
     }
 
     fn load() -> Result<Self, MpvError> {
-        // The first name that loads wins; the older sonames are the fallback.
-        #[cfg(windows)]
-        const LIB_CANDIDATES: &[&str] = &["libmpv-2.dll", "mpv-2.dll"];
-        #[cfg(unix)]
-        const LIB_CANDIDATES: &[&str] = &["libmpv.so.2", "libmpv.so.1", "libmpv.so"];
-
 
         let lib = unsafe {
             let mut loaded = None;

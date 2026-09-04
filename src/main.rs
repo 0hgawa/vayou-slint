@@ -18,7 +18,14 @@ mod error;
 // Claiming the media file types is a Windows registry affair the running program
 // does for itself. Elsewhere the association comes from the `.desktop` entry a
 // package installs, so there is nothing for the binary to register.
-#[cfg(windows)]
+//
+// Absent from a debug build, and not merely unused: registration rewrites the
+// machine's associations to whatever executable is running, so every `cargo run`
+// pointed the user's whole media library at `target/debug/vayou.exe` — which has
+// no libmpv beside it, and which the shell launches without the PATH `dev.bat`
+// sets. Double-clicking a film then opened a console with a load error, on a
+// machine where the installed copy was working perfectly.
+#[cfg(all(windows, not(debug_assertions)))]
 mod file_assoc;
 mod keybindings;
 mod mpv;
@@ -119,10 +126,6 @@ fn install_tracing() {
 
 fn main() -> Result<(), slint::PlatformError> {
     install_tracing();
-
-    // Register file associations off-thread so it never delays startup.
-    #[cfg(windows)]
-    std::thread::spawn(file_assoc::ensure_registered);
 
     // The OpenGL underlay needs the femtovg/GL renderer so the rendering
     // notifier yields a NativeOpenGL context for mpv to render into.
