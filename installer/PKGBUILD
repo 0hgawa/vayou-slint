@@ -12,7 +12,7 @@
 # nothing else here changes between versions.
 
 pkgname=vayou
-pkgver=0.1.4
+pkgver=0.1.5
 pkgrel=1
 pkgdesc='Native video player — libmpv engine, Slint UI, frameless single window'
 arch=('x86_64')
@@ -59,7 +59,7 @@ makedepends=('cargo')
 # rather than in one machine's makepkg.conf.
 options=('!lto')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('0231a85a0d93c56e4e0f50808b64305d7dd01cfe1bc9c6814bc312e0228b043e')
+sha256sums=('d6172964307997d67fe1f5b1a6734f27790f5ab777d9f68432a3987ea7709310')
 
 prepare() {
   cd "vayou-slint-$pkgver"
