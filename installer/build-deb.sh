@@ -61,7 +61,10 @@ shlibs_dir="$(mktemp -d)"
 trap 'rm -rf "$stage" "$shlibs_dir"' EXIT
 mkdir -p "$shlibs_dir/debian"
 printf 'Source: vayou\n' > "$shlibs_dir/debian/control"
-linked="$(cd "$shlibs_dir" && dpkg-shlibdeps -O --ignore-missing-info "$root/$bin" 2>/dev/null | sed 's/^shlibs:Depends=//')"
+# `$bin` is already absolute; stderr is left alone on purpose, because the one
+# thing worse than this step failing is it failing without saying why.
+linked="$(cd "$shlibs_dir" && dpkg-shlibdeps -O --ignore-missing-info "$bin" | sed 's/^shlibs:Depends=//')" ||
+  { echo "error: dpkg-shlibdeps failed against $bin (see its output above)." >&2; exit 1; }
 [[ -n "$linked" ]] || { echo "error: dpkg-shlibdeps produced no dependencies — refusing to ship a package that declares none." >&2; exit 1; }
 
 # Kibibytes of installed content, which is what the field means. Package
