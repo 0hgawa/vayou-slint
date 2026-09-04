@@ -108,6 +108,16 @@ jobs:
           install -Dm644 assets/icon.svg              "$stage/vayou.svg"
           tar -czf "vayou-$ver-linux-x86_64.tar.gz" "$stage"
 
+      # The tarball's counterpart for apt, and the reason it is worth building:
+      # it declares libmpv and ffmpeg as dependencies, which a tarball cannot do.
+      # The dependency list is computed from the binary — see build-deb.sh.
+      - name: Package the Debian package
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y --no-install-recommends dpkg-dev
+          installer/build-deb.sh
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.platform }}
@@ -115,6 +125,7 @@ jobs:
             target/release/${{ matrix.bin }}
             installer/Vayou-Setup.exe
             vayou-*-linux-x86_64.tar.gz
+            vayou_*_amd64.deb
           if-no-files-found: ignore
 
   # Signing is its own job so the key is reachable from exactly one place, and
@@ -206,4 +217,5 @@ jobs:
           gh release create "$tag" --draft --title "Vayou $tag" --generate-notes \
             "$win" "$lin" latest.json \
             dist/windows-x86_64/installer/Vayou-Setup.exe \
-            dist/linux-x86_64/vayou-*-linux-x86_64.tar.gz
+            dist/linux-x86_64/vayou-*-linux-x86_64.tar.gz \
+            dist/linux-x86_64/vayou_*_amd64.deb
