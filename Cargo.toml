@@ -1,6 +1,6 @@
 [package]
 name = "vayou"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 description = "Vayou — native video player (libmpv + Slint). Single window, frameless, GPU video."
 authors = ["Ohgawa"]
