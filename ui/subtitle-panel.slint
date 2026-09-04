@@ -78,34 +78,51 @@ export component SubtitlePanel inherits SidePanel {
     action => { root.reset-sub-style(); }
 
     if PlayerState.sub-page == "main": VerticalLayout {
+        // Only the tracks scroll.
+        //
+        // The actions below used to sit inside this same scroll, which made a
+        // fixed menu behave like variable content: a release carrying a dozen
+        // subtitle tracks pushed "Style" past the cap, so the rows that adjust
+        // subtitles disappeared on exactly the files whose subtitles most need
+        // adjusting — and nothing on screen said they were there.
+        //
+        // A whole number of rows, not a half. Cutting a row in two was meant to
+        // say the list continues, but what it actually cuts is the track's own
+        // label — a subtitle name sliced through the middle of its letters,
+        // which reads as a rendering fault rather than as an invitation to
+        // scroll. The scrollbar already carries that message. Expressed in
+        // `row-h` so five rows stay five if that token ever moves.
         VScroll {
-            max-height: 320px;
-            submain := VerticalLayout {
+            max-height: Theme.row-h * 5;
+            VerticalLayout {
                 MenuItem {
                     show-check: true; checked: !PlayerState.sub-active;
                     active: !PlayerState.sub-active;
                     label: @tr("Disable"); clicked => { root.select-sub(-1); }
                 }
                 for t in PlayerState.panel-sub-tracks: MenuItem { show-check: true; checked: t.selected; active: t.selected; label: t.label; clicked => { root.select-sub(t.id); } }
-                MenuSep {}
-                MenuItem { icon: Ic.file; label: @tr("Open local subtitle"); clicked => { root.load-external-sub(); } }
-                MenuItem { icon: Ic.search; label: @tr("Search online..."); arrow: true; clicked => { PlayerState.sub-page = "search"; root.do-search(); } }
-                MenuItem {
-                    icon: Ic.translate; label: @tr("Translate"); arrow: !PlayerState.translating;
-                    // Extraction reports no progress and is the long half on a
-                    // large file, so it names itself instead of showing a
-                    // percentage that would sit at 0 for minutes.
-                    value-hint: PlayerState.translating
-                        ? (PlayerState.tr-phase == "extracting"
-                            ? @tr("Extracting subtitles…")
-                            : "\{PlayerState.tr-total > 0 ? round(PlayerState.tr-progress / PlayerState.tr-total * 100) : 0}%")
-                        : (PlayerState.translate-lang == "off" ? "" : PlayerState.translate-lang-name);
-                    clicked => { PlayerState.sub-page = "translateLang"; }
-                }
-                MenuItem { icon: Ic.style; label: @tr("Style"); arrow: true; clicked => { PlayerState.sub-page = "style"; } }
-                MenuSep {}
             }
         }
+        MenuSep {}
+        // Fixed from here down, whatever the track list does above.
+        VerticalLayout {
+            MenuItem { icon: Ic.file; label: @tr("Open local subtitle"); clicked => { root.load-external-sub(); } }
+            MenuItem { icon: Ic.search; label: @tr("Search online..."); arrow: true; clicked => { PlayerState.sub-page = "search"; root.do-search(); } }
+            MenuItem {
+                icon: Ic.translate; label: @tr("Translate"); arrow: !PlayerState.translating;
+                // Extraction reports no progress and is the long half on a
+                // large file, so it names itself instead of showing a
+                // percentage that would sit at 0 for minutes.
+                value-hint: PlayerState.translating
+                    ? (PlayerState.tr-phase == "extracting"
+                        ? @tr("Extracting subtitles…")
+                        : "\{PlayerState.tr-total > 0 ? round(PlayerState.tr-progress / PlayerState.tr-total * 100) : 0}%")
+                    : (PlayerState.translate-lang == "off" ? "" : PlayerState.translate-lang-name);
+                clicked => { PlayerState.sub-page = "translateLang"; }
+            }
+            MenuItem { icon: Ic.style; label: @tr("Style"); arrow: true; clicked => { PlayerState.sub-page = "style"; } }
+        }
+        MenuSep {}
         if PlayerState.tr-error != "": TrErrorBanner {}
         Stepper {
             label: @tr("Delay"); value: "\{round(PlayerState.sub-delay * 10) / 10}s";
